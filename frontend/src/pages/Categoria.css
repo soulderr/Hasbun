@@ -1,0 +1,46 @@
+.titulo {
+  font-size: 3.2em;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+
+.categoria {
+  padding-top: 10px; /* Ajusta este valor según la altura de tu header */
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  max-height: 80vh; /* Limita la altura máxima de la clase */
+  overflow-y: auto; /* Permite el desplazamiento vertical */
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.category-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px; /* Espacio entre los elementos */
+  align-items: center;
+}
+
+.category-item {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px;
+  width: 200px;
+  text-align: center;
+  text-decoration: none; /* Elimina el subrayado de los enlaces */
+  color: inherit; /* Hereda el color del texto */
+}
+
+.category-item:hover {
+  background-color: #f0f0f0; /* Cambia el color de fondo al pasar el ratón */
+}
+
+.category-image {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+}

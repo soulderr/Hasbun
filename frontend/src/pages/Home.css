@@ -1,0 +1,24 @@
+.home {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh; /* Ajusta este valor según el alto deseado */
+  padding-top: 60px; /* Ajusta este valor según la altura de tu header */
+  box-sizing: border-box;
+}
+
+.carousel {
+  width: 100%; /* Ajusta este valor según el ancho deseado */
+  max-width: 800px; /* Ajusta este valor según el ancho máximo deseado */
+  margin: 0 auto; /* Centra el carrusel horizontalmente */
+  border: 4px solid #737373; /* Agrega un borde al carrusel */
+  border-radius: 10px; /* Agrega bordes redondeados al carrusel */
+  overflow: hidden; /* Asegura que las imágenes no sobresalgan del borde redondeado */
+}
+
+.carousel-image {
+  width: 400px;
+  height: 400px; /* Ajusta este valor según el alto deseado */
+  object-fit: cover; /* Asegura que la imagen se ajuste al contenedor y mantenga su proporción */
+}

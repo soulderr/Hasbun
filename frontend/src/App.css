@@ -1,0 +1,25 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.App {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 80%; /* Ajusta este valor según el ancho deseado */
+  margin: 20px auto; /* Centra el contenido horizontalmente */
+  box-sizing: border-box;
+  padding-top: 50px; /* Ajusta este valor según la altura de tu header */
+}
+
+main {
+  flex: 1;
+  padding-top: 60px; /* Ajusta este valor según la altura de tu header */
+  padding-bottom: 60px; /* Ajusta este valor según la altura de tu footer */
+}

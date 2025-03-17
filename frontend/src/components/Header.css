@@ -1,0 +1,116 @@
+.header {
+  background-color: #ed0e06;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  margin: auto;
+  height: 80px; /* Ajusta este valor según la altura deseada */
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.navList {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.navItem {
+  margin: 0 10px;
+  position: relative;
+}
+
+.navLink {
+  color: white;
+  text-decoration: none;
+}
+
+.navImage {
+  height: 50px; /* Ajusta este valor según la altura deseada */
+  width: auto;
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdownMenu {
+  display: none;
+  position: absolute;
+  background-color: #ed0e06;
+  top: 100%;
+  left: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  min-width: 150px;
+  z-index: 1000;
+}
+
+.dropdownItem {
+  padding: 10px;
+}
+
+.dropdownItem .navLink {
+  display: block;
+  padding: 10px;
+}
+
+.navItem:hover .dropdownMenu {
+  display: block;
+}
+
+/* Estilos responsivos */
+@media (max-width: 780px) {
+  .navList {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background-color: #ed0e06;
+    position: fixed;
+    top: 60px; /* Ajusta este valor según la altura de tu header */
+    left: 0;
+  }
+
+  .navList.active {
+    display: flex;
+  }
+
+  .navItem {
+    margin: 5px 0;
+  }
+
+  .hamburger {
+    display: block;
+    cursor: pointer;
+  }
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.hamburger div {
+  width: 25px;
+  height: 3px;
+  background-color: white;
+  margin: 4px 0;
+}

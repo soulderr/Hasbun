@@ -1,0 +1,26 @@
+.producto-detalle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+    max-height: 80vh; /* Limita la altura máxima de la clase */
+    overflow-y: auto; /* Permite el desplazamiento vertical */
+  }
+  
+  .producto-imagen {
+    width: 200px;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .producto-detalle h2 {
+    font-size: 2em;
+    margin-bottom: 10px;
+  }
+  
+  .producto-detalle p {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
