@@ -8,20 +8,23 @@ import Fierros from './pages/Fierros';
 import ProductoDetalle from './pages/ProductoDetalle'; // Importa el componente de detalles del producto
 import './App.css';
 
+
 function App() {
   return (
     <Router>
-      
+      <div id="root">
         <Header />
-            <Routes>
+        <main>
+          <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/categorias" element={<Categoria />} />
             <Route path="/categorias/1" element={<Fierros />} />
             <Route path="/productos/:id" element={<ProductoDetalle />} /> {/* Asegúrate de que la ruta esté definida correctamente */}
             {/* Agrega más rutas según sea necesario */}
           </Routes>
+        </main>
         <Footer />
-      
+      </div>
     </Router>
   );
 }

@@ -1,11 +1,11 @@
 .producto-detalle {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 5%;
     text-align: center;
-    max-height: 80vh; /* Limita la altura máxima de la clase */
+    justify-content: center;
+    align-items: center;
+    max-height: 60vh; /* Limita la altura máxima de la clase */
     overflow-y: auto; /* Permite el desplazamiento vertical */
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .producto-imagen {

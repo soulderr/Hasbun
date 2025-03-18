@@ -14,15 +14,6 @@ body, html {
   box-sizing: border-box;
 }
 
-.App {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 80%; /* Ajusta este valor según el ancho deseado */
-  margin: 20px auto; /* Centra el contenido horizontalmente */
-  box-sizing: border-box;
-}
 
 main {
   flex: 1;
@@ -32,12 +23,15 @@ main {
   justify-content: center;
   padding-top: 60px; /* Ajusta este valor según la altura de tu header */
   padding-bottom: 60px; /* Ajusta este valor según la altura de tu footer */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 header {
-  height: 30px; /* Ajusta este valor según la altura de tu header */
+  width: 100%;
+  height: 60px; /* Ajusta este valor según la altura de tu header */
+  position: fixed;
+  top: 0;
+  left: 0;
 }
 
-footer {
-  height: 30px; /* Ajusta este valor según la altura de tu footer */
-}

@@ -9,43 +9,64 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ children }) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Alternar el menú dropdown
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
+  // Cerrar el menú dropdown
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
+
+  // Redirigir cuando se hace clic en "Productos"
+  const handleRedirectToCategorias = () => {
+    window.location.href = '/categorias'; // Cambia la URL directamente
+  };
+
   return (
     <header className="header">
-      <nav className="nav">
-        <Link to="/" className="navLink">
-          <img 
-            src="https://dojiw2m9tvv09.cloudfront.net/68086/brand/hasbun1774.png" 
-            alt="Inicio" 
-            className="navImage"
-        />
-        </Link>
-        <ul className={`navList ${menuOpen ? 'active' : ''}`}>
-          <li className="navItem"><Link to="/quotes" className="navLink">Cotiza</Link></li>
-          <li className="navItem dropdown">
-            <Link to="/categorias" className="navLink">Productos</Link>
-            <ul className="dropdownMenu">
-              <li className="dropdownItem"><Link to="/categorias/1" className="navLink">Tubos</Link></li>
-              <li className="dropdownItem"><Link to="/categorias/item2" className="navLink">Pastelones</Link></li>
-              <li className="dropdownItem"><Link to="/categorias/item3" className="navLink">Tuberias</Link></li>
-              <li className="dropdownItem"><Link to="/categorias/item4" className="navLink">Categoria 4</Link></li>
-              <li className="dropdownItem"><Link to="/categorias/item5" className="navLink">Categoria 5</Link></li>
-              <li className="dropdownItem"><Link to="/categorias/item6" className="navLink">Categoria 6</Link></li>
-              <li className="dropdownItem"><Link to="/categorias/item7" className="navLink">Categoria 7</Link></li>
+      <nav className="navbar navbar-expand-lg navbar-light bg-light">
+        <div className="container-fluid">
+          <Link to="/" className="navbar-brand">
+            <img 
+              src="https://dojiw2m9tvv09.cloudfront.net/68086/brand/hasbun1774.png" 
+              alt="Inicio" 
+              className="navImage"
+            />
+          </Link>
+          <button 
+            className="navbar-toggler" 
+            type="button" 
+            onClick={toggleMenu} 
+            aria-controls="navbarNavDropdown" 
+            aria-expanded={menuOpen ? 'true' : 'false'} 
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div className={`collapse navbar-collapse ${menuOpen ? 'show' : ''}`} id="navbarNavDropdown">
+            <ul className="navbar-nav">
+              <li className="nav-item">
+                <Link to="/quotes" className="nav-link" onClick={closeMenu}>Cotiza</Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/categorias" className="nav-link" onClick={closeMenu}>Productos</Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/inventario" className="nav-link" onClick={closeMenu}>Inventario</Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/contacto" className="nav-link" onClick={closeMenu}>Contacto</Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/registro" className="nav-link" onClick={closeMenu}>Registrarse</Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/inicioSesion" className="nav-link" onClick={closeMenu}>Inicio de Sesión</Link>
+              </li>
             </ul>
-          </li>
-          <li className="navItem"><Link to="/inventario" className="navLink">Inventario</Link></li>
-          <li className="navItem"><Link to="/contacto" className="navLink">Contacto</Link></li>
-          <li className="navItem"><Link to="/registro" className="navLink">Registrarse</Link></li>
-          <li className="navItem"><Link to="/inicioSesion" className="navLink">Inicio de Sesión</Link></li>
-        </ul>
-        <div className="hamburger" onClick={toggleMenu}>
-          <div></div>
-          <div></div>
-          <div></div>
+          </div>
         </div>
       </nav>
     </header>
