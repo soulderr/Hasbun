@@ -6,13 +6,13 @@
   left: 0;
   width: 100%;
   box-sizing: border-box;
-  padding: 10px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 1000;
   margin: auto;
-  height: 80px; /* Ajusta este valor según la altura deseada */
+  margin-bottom: 10px;
+  height: 60px; /* Ajusta este valor según la altura deseada */
 }
 
 .nav {
@@ -29,6 +29,8 @@
   padding: 0;
   width: 100%;
   justify-content: space-around;
+  position :absolute;
+  padding-left : 10%;
 }
 
 .navItem {

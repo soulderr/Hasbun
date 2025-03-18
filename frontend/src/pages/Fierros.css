@@ -5,12 +5,12 @@
   }
   
   .fierros {
-    padding-top: 10px; /* Ajusta este valor según la altura de tu header */
     text-align: center;
     justify-content: center;
     align-items: center;
     max-height: 80vh; /* Limita la altura máxima de la clase */
     overflow-y: auto; /* Permite el desplazamiento vertical */
+    padding: 5%;
   }
   
   .category-list {

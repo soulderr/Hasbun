@@ -11,17 +11,17 @@ import './App.css';
 function App() {
   return (
     <Router>
-      <div className="App">
+      
         <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/categorias" element={<Categoria />} />
-          <Route path="/categorias/1" element={<Fierros />} />
-          <Route path="/productos/:id" element={<ProductoDetalle />} /> {/* Asegúrate de que la ruta esté definida correctamente */}
-          {/* Agrega más rutas según sea necesario */}
-        </Routes>
+            <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/categorias" element={<Categoria />} />
+            <Route path="/categorias/1" element={<Fierros />} />
+            <Route path="/productos/:id" element={<ProductoDetalle />} /> {/* Asegúrate de que la ruta esté definida correctamente */}
+            {/* Agrega más rutas según sea necesario */}
+          </Routes>
         <Footer />
-      </div>
+      
     </Router>
   );
 }

@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding: 5%;
     text-align: center;
     max-height: 80vh; /* Limita la altura máxima de la clase */
     overflow-y: auto; /* Permite el desplazamiento vertical */
@@ -23,4 +23,8 @@
   .producto-detalle p {
     font-size: 1.2em;
     margin-bottom: 10px;
+  }
+
+  .btn-outline-danger {
+    margin: 2px;
   }

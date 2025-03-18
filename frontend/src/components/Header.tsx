@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
             src="https://dojiw2m9tvv09.cloudfront.net/68086/brand/hasbun1774.png" 
             alt="Inicio" 
             className="navImage"
-          />
+        />
         </Link>
         <ul className={`navList ${menuOpen ? 'active' : ''}`}>
           <li className="navItem"><Link to="/quotes" className="navLink">Cotiza</Link></li>

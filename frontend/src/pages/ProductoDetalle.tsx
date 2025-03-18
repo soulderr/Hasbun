@@ -32,6 +32,8 @@ const ProductoDetalle: React.FC = () => {
       </button>
       <p></p>
       <button className="btn btn-outline-danger">Comprar</button>
+      <p></p>
+      <button className="btn btn-outline-danger">Descargar ficha tecnica</button>
     </div>
   );
 };

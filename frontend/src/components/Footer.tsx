@@ -5,7 +5,7 @@ const Footer: React.FC = () => {
   return (
     <footer className="footer">
       
-      <text>&copy; Cristian Montes Sanchez</text>
+      <text className='textoFooter'>&copy; Cristian Montes Sanchez</text>
       
     </footer>
   );
