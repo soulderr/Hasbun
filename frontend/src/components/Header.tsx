@@ -63,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
                 <Link to="/registro" className="nav-link" onClick={closeMenu}>Registrarse</Link>
               </li>
               <li className="nav-item">
-                <Link to="/inicioSesion" className="nav-link" onClick={closeMenu}>Inicio de Sesión</Link>
+                <Link to="/login" className="nav-link" onClick={closeMenu}>Inicio de Sesión</Link>
               </li>
             </ul>
           </div>

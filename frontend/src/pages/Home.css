@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  height: 100vh; /* Ajusta este valor según el alto deseado */
+  height: 70vh; /* Ajusta este valor según el alto deseado */
   padding-top: 60px; /* Ajusta este valor según la altura de tu header */
   box-sizing: border-box;
   width: 70%;

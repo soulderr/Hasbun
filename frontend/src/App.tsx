@@ -5,6 +5,9 @@ import Home from './pages/Home';
 import Footer from './components/Footer';
 import Categoria from './pages/Categoria';
 import Fierros from './pages/Fierros';
+import Registro from './pages/Registro';
+import Login from './pages/Login';
+import Inventario from './pages/Inventario';
 import ProductoDetalle from './pages/ProductoDetalle'; // Importa el componente de detalles del producto
 import './App.css';
 
@@ -20,6 +23,9 @@ function App() {
             <Route path="/categorias" element={<Categoria />} />
             <Route path="/categorias/1" element={<Fierros />} />
             <Route path="/productos/:id" element={<ProductoDetalle />} /> {/* Asegúrate de que la ruta esté definida correctamente */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/registro" element={<Registro />} />
+            <Route path="/inventario" element={<Inventario />} />
             {/* Agrega más rutas según sea necesario */}
           </Routes>
         </main>
