@@ -6,36 +6,36 @@ import './Registro.css';
 
 function Registro() {
   return (
-  <div className="registro-container">
-    <Card className="login-card">
+    <div className="registro-container">
+      <Card className="login-card">
         <Card.Body>
           <Form>
-          <h1 className="welcome-text">Registrate en Hasbun</h1>
+            <h1 className="welcome-text">Registrate en Hasbun</h1>
             <Form.Group className="mb-3" controlId="formGroupEmail">
               <Form.Label>Email</Form.Label>
-              <Form.Control type="email" placeholder="Ingresa tu correo electronico" />
+              <Form.Control required type="email" placeholder="Ingresa tu correo electronico" className="input-dark" />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formGroupPassword">
               <Form.Label>Contraseña</Form.Label>
-              <Form.Control required type="password" placeholder="Ingresa tu contraseña" />
+              <Form.Control required type="password" placeholder="Ingresa tu contraseña" className="input-dark" />
             </Form.Group>
-            <Form.Group className="mb-3" controlId="formGroupPassword">
+            <Form.Group className="mb-3" controlId="formGroupConfirmPassword">
               <Form.Label>Confirmar contraseña</Form.Label>
-              <Form.Control required type="password" placeholder="Ingresa tu contraseña nuevamente" />
+              <Form.Control required type="password" placeholder="Ingresa tu contraseña nuevamente" className="input-dark" />
             </Form.Group>
             <Form.Check
-          required
-          label="Acepto terminos y condiciones"
-          feedback="You must agree before submitting."
-          feedbackType="invalid"
-        />
+              required
+              label="Acepto terminos y condiciones"
+              feedback="You must agree before submitting."
+              feedbackType="invalid"
+            />
             <Button variant="danger" type="submit">
-              Ingresa
+              Registrar
             </Button>
           </Form>
         </Card.Body>
       </Card>
-  </div>
+    </div>
   );
 }
 

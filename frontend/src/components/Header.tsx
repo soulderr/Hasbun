@@ -48,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
           <div className={`collapse navbar-collapse ${menuOpen ? 'show' : ''}`} id="navbarNavDropdown">
             <ul className="navbar-nav">
               <li className="nav-item">
-                <Link to="/quotes" className="nav-link" onClick={closeMenu}>Cotiza</Link>
+                <Link to="/cotizador" className="nav-link" onClick={closeMenu}>Cotiza</Link>
               </li>
               <li className="nav-item">
                 <Link to="/categorias" className="nav-link" onClick={closeMenu}>Productos</Link>

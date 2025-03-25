@@ -1,29 +1,33 @@
-.login-container {
+.cotizador-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    padding: 20px;
+    padding-top: 100px; /* Ajusta este valor según la altura de tu header */
+    box-sizing: border-box;
+    min-height: 30vh;
+    max-height: 80vh;
+    overflow-y: auto; /* Permite el desplazamiento vertical */
+  }
+  
+  .cotizador-card {
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     box-sizing: border-box;
-}
-
-.welcome-text {
-    text-decoration: underline;
+  }
+  
+  .titulo {
     margin-bottom: 20px;
     font-size: 2em;
     text-align: center;
-}
-
-.login-card {
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilos para los campos de entrada de Login */
-.input-dark {
+    text-decoration: underline;
+  }
+  
+  /* Estilos para los campos de entrada de Cotizador */
+  .input-dark {
     background-color: #f0f0f0; /* Color de fondo más oscuro */
     border: 1px solid #ccc; /* Borde gris */
     padding: 10px;
@@ -31,10 +35,16 @@
     width: 100%;
     box-sizing: border-box;
     margin-bottom: 10px;
-}
+  }
   
-.input-dark:focus {
+  .input-dark:focus {
     background-color: #ffffff; /* Color de fondo más oscuro al enfocar */
     border-color: #df0404; /* Borde más oscuro al enfocar */
     outline: none; /* Eliminar el borde de enfoque predeterminado */
-}
+  }
+  
+  .total, .acumulado {
+    margin-top: 20px;
+    font-size: 1.5em;
+    text-align: center;
+  }

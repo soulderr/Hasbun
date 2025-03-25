@@ -8,6 +8,8 @@ import Fierros from './pages/Fierros';
 import Registro from './pages/Registro';
 import Login from './pages/Login';
 import Inventario from './pages/Inventario';
+import Contacto from './pages/Contacto';
+import Cotizador from './pages/Cotizador';
 import ProductoDetalle from './pages/ProductoDetalle'; // Importa el componente de detalles del producto
 import './App.css';
 
@@ -26,6 +28,8 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/inventario" element={<Inventario />} />
+            <Route path="/contacto" element={<Contacto />} />
+            <Route path="/cotizador" element={<Cotizador />} />
             {/* Agrega más rutas según sea necesario */}
           </Routes>
         </main>

@@ -1,20 +1,50 @@
 .registro-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    box-sizing: border-box;
-  }
-  
-  .welcome-text {
-    margin-bottom: 20px;
-    font-size: 2em;
-    text-align: center;
-  }
-  
-  .registro-card {
-    width: 80%;
-    max-width: 400px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.welcome-text {
+  margin-bottom: 20px;
+  font-size: 2em;
+  text-align: center;
+}
+
+.login-card {
+  width: 80%;
+  max-width: 400px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Estilos para los campos de entrada de Registro */
+.input-dark {
+  background-color: #f0f0f0; /* Color de fondo más oscuro */
+  border: 1px solid #ccc; /* Borde gris */
+  padding: 10px;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+
+.input-dark:focus {
+  background-color: #ffffff; /* Color de fondo más oscuro al enfocar */
+  border-color: #df0404; /* Borde más oscuro al enfocar */
+  outline: none; /* Eliminar el borde de enfoque predeterminado */
+}
+
+/* Estilos para el Form.Check */
+.form-check-input {
+  background-color: #f0f0f0; /* Color de fondo más oscuro */
+  border: 1px solid #ccc; /* Borde gris */
+}
+
+.form-check-input:checked {
+  background-color: #df0404; /* Color de fondo cuando está marcado */
+  border-color: #df0404; /* Borde cuando está marcado */
+}
