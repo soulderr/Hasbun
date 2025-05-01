@@ -2,7 +2,7 @@
 AplicacionWeb
 
 ## Comando para activar el entorno virtual
-    .\venv\Scripts\activate
+    .\.venv\Scripts\activate
 
 ## Configuración del backend
 
