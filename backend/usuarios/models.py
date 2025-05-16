@@ -3,8 +3,8 @@ from django.db import models
 # Create your models here.
 
 class Usuario(models.Model):
-    id = models.AutoField(primary_key=True)
-    #id_cotizacion = models.ForeignKey('Cotizacion', on_delete=models.PROTECT)
+    idUsuario = models.AutoField(primary_key=True)
+    id_cotizacion = models.ForeignKey('cotizacion.Cotizacion', on_delete=models.PROTECT, null=True, blank=True)#para poder crear el usuario sin tener una cotizacion vinculada
     nombreUsuario = models.CharField(max_length=23)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=20)
