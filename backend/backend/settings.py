@@ -40,6 +40,11 @@ INSTALLED_APPS = [
     'usuarios',
     'cotizacion',
     'carrito',
+    'producto',
+    'categoria',
+    'detalleVenta',
+    'venta',
+    'metodoPago',
     'corsheaders',
     'rest_framework',
 
@@ -135,3 +140,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = []
+
+#import os
+
+# Configuración de archivos estáticos
+#MEDIA_URL = '/media/'  # Ruta para acceder a archivos
+#MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Carpeta donde se almacenan
