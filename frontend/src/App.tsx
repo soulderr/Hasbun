@@ -12,7 +12,8 @@ import Contacto from './pages/Contacto';
 import Cotizador from './pages/Cotizador';
 import ProductoDetalle from './pages/ProductoDetalle'; // Importa el componente de detalles del producto
 import './App.css';
-
+import Dashboard from './pages/Dashboard';
+import PrivateRoute from './pages/PrivateRoute';
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
         <Header />
         <main>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/categorias" element={<Categoria />} />
             <Route path="/categorias/1" element={<Fierros />} />
             <Route path="/productos/:id" element={<ProductoDetalle />} /> {/* Asegúrate de que la ruta esté definida correctamente */}
@@ -30,6 +31,7 @@ function App() {
             <Route path="/inventario" element={<Inventario />} />
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/cotizador" element={<Cotizador />} />
+            <Route path="/dashboard" element={ <Dashboard />} />
             {/* Agrega más rutas según sea necesario */}
           </Routes>
         </main>

@@ -28,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
     <header className="header">
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid">
-          <Link to="/" className="navbar-brand">
+          <Link to="/home" className="navbar-brand">
             <img 
               src="https://dojiw2m9tvv09.cloudfront.net/68086/brand/hasbun1774.png" 
               alt="Inicio" 

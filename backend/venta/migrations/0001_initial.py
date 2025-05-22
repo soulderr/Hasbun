@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('usuarios', '0004_rename_id_usuario_idusuario'),
+        ('usuarios', '__first__'),
     ]
 
     operations = [
