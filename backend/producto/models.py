@@ -16,5 +16,5 @@ class Producto(models.Model):
     peso = models.DecimalField(max_digits=6, decimal_places=2)
 
     def __str__(self):
-        return f"{self.nombreProducto} {self.precioProducto} {self.stock} {self.descripcion} {self.peso}"
+        return f"{self.idProducto}{self.nombreProducto} {self.precioProducto} {self.stock} {self.descripcion} "
         
