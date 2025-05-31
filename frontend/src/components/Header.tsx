@@ -51,7 +51,7 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
                 <Link to="/cotizador" className="nav-link" onClick={closeMenu}>Cotiza</Link>
               </li>
               <li className="nav-item">
-                <Link to="/categorias" className="nav-link" onClick={closeMenu}>Productos</Link>
+                <Link to="/categoria" className="nav-link" onClick={closeMenu}>Productos</Link>
               </li>
               <li className="nav-item">
                 <Link to="/inventario" className="nav-link" onClick={closeMenu}>Inventario</Link>

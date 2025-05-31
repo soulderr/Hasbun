@@ -14,6 +14,7 @@ import ProductoDetalle from './pages/ProductoDetalle'; // Importa el componente 
 import './App.css';
 import Dashboard from './pages/Dashboard';
 import PrivateRoute from './pages/PrivateRoute';
+import CategoriaProducto from './pages/CategoriaProducto';
 
 function App() {
   return (
@@ -23,9 +24,10 @@ function App() {
         <main>
           <Routes>
             <Route path="/home" element={<Home />} />
-            <Route path="/categorias" element={<Categoria />} />
-            <Route path="/categorias/1" element={<Fierros />} />
-            <Route path="/productos/:id" element={<ProductoDetalle />} /> {/* Asegúrate de que la ruta esté definida correctamente */}
+            <Route path="/categoria" element={<Categoria />} />
+            <Route path="/categoria/:categoryIdFromUrl" element={<Categoria />} /> {/* Ruta para subcategorías */}
+            <Route path="/producto/:id" element={<ProductoDetalle />} />
+            <Route path="/productos/categoria/:categoryId" element={<CategoriaProducto />} />
             <Route path="/login" element={<Login />} />
             <Route path="/registro" element={<Registro />} />
             <Route path="/inventario" element={<Inventario />} />

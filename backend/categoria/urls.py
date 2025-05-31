@@ -1,9 +1,10 @@
 from django.urls import path, include
-from rest_framework import routers
-from categoria import views
+from rest_framework.routers import DefaultRouter
+from .views import CategoriaView
 
-router = routers.DefaultRouter()
-router.register('categoria', views.CategoriaView, basename='categoria')
+router = DefaultRouter()
+
+router.register(r'', CategoriaView, basename='categoria')
 
 urlpatterns = [
     path('', include(router.urls)),
