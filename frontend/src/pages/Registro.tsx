@@ -4,7 +4,7 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import './Registro.css';
-const API_URL = 'http://127.0.0.1:8000/api/registro/';
+const API_URL = 'http://127.0.0.1:8000/registro/';
 
 function Registro() {
   const [formData, setFormData] = useState({
@@ -47,8 +47,11 @@ function Registro() {
 
       console.log('Tokens guardados:', response.data);
       // Aquí puedes redirigir al usuario o mostrar mensaje de éxito
+      setTimeout(() => {
+        setSuccess('');
+      }, 3000); // Limpia el mensaje de éxito después de 3 segundos
       // Por ejemplo, redirigir a la página de inicio
-      window.location.href = '/home';
+      //window.location.href = '/login';
       // Limpia el formulario
       setFormData({
         email: '',

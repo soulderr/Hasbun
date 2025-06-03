@@ -30,7 +30,7 @@ urlpatterns = [
     path('detalleVenta/', include('detalleVenta.urls')),
     path('venta/', include('venta.urls')),
     path('metodoPago/', include('metodoPago.urls')),
-    path('api/registro/', RegisterView.as_view()),
-    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('registro/', RegisterView.as_view()),
+    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

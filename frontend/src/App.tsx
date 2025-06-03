@@ -15,6 +15,8 @@ import './App.css';
 import Dashboard from './pages/Dashboard';
 import PrivateRoute from './pages/PrivateRoute';
 import CategoriaProducto from './pages/CategoriaProducto';
+import ResetPassword from './pages/ResetPassword';
+import OlvidePassword from './pages/OlvidePassword';
 
 function App() {
   return (
@@ -34,6 +36,8 @@ function App() {
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/cotizador" element={<Cotizador />} />
             <Route path="/dashboard" element={ <Dashboard />} />
+            <Route path="/restablecer-password/:uid/:token/" element={<ResetPassword />} />
+            <Route path="/recuperar" element={<OlvidePassword />} />
             {/* Agrega más rutas según sea necesario */}
           </Routes>
         </main>

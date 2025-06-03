@@ -4,6 +4,7 @@ import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -13,7 +14,7 @@ function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/login/', {
+      const response = await axios.post('http://127.0.0.1:8000/login/', {
         email,
         password
       });
@@ -55,6 +56,9 @@ function Login() {
             />
           </Form.Group>
           <Button variant="danger" type="submit">Ingresar</Button>
+          <div className="text-center mt-3">
+            <Link to="/recuperar">¿Olvidaste tu contraseña?</Link>
+          </div>
         </Form>
       </Card.Body>
     </Card>

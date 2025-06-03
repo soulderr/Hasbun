@@ -66,7 +66,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],  # O si usas os.path: os.path.join(BASE_DIR, "templates")
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -155,3 +155,11 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'cristianeduardomontes@gmail.com'        # Usa tu correo
+EMAIL_HOST_PASSWORD = 'gejl hjvv vqmz dblu'  # Usa una contraseña de aplicación si es Gmail
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
