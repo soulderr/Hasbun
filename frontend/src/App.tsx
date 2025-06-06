@@ -17,6 +17,7 @@ import PrivateRoute from './pages/PrivateRoute';
 import CategoriaProducto from './pages/CategoriaProducto';
 import ResetPassword from './pages/ResetPassword';
 import OlvidePassword from './pages/OlvidePassword';
+import Carrito from './components/Carrito';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             <Route path="/dashboard" element={ <Dashboard />} />
             <Route path="/restablecer-password/:uid/:token/" element={<ResetPassword />} />
             <Route path="/recuperar" element={<OlvidePassword />} />
+            <Route path="/carrito" element={<Carrito />} />
             {/* Agrega más rutas según sea necesario */}
           </Routes>
         </main>

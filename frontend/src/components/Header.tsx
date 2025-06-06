@@ -1,28 +1,43 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './header.css';
+import { FaShoppingCart } from 'react-icons/fa';
 
-interface HeaderProps {
-  children?: React.ReactNode;
-}
-
-const Header: React.FC<HeaderProps> = ({ children }) => {
+const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+  const navigate = useNavigate();
 
-  // Alternar el menú dropdown
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+  // Leer y contar productos del carrito desde localStorage
+  const updateCartCount = () => {
+    const carrito = localStorage.getItem('carrito');
+    if (carrito) {
+      try {
+        const items = JSON.parse(carrito);
+        const total = items.reduce((acc: number, item: any) => acc + item.cantidad, 0);
+        setCartCount(total);
+      } catch {
+        setCartCount(0);
+      }
+    } else {
+      setCartCount(0);
+    }
   };
 
-  // Cerrar el menú dropdown
-  const closeMenu = () => {
-    setMenuOpen(false);
-  };
+  useEffect(() => {
+    updateCartCount();
 
-  // Redirigir cuando se hace clic en "Productos"
-  const handleRedirectToCategorias = () => {
-    window.location.href = '/categorias'; // Cambia la URL directamente
-  };
+    // Escuchar eventos de actualización del carrito
+    const handleCarritoActualizado = () => updateCartCount();
+    window.addEventListener('carritoActualizado', handleCarritoActualizado);
+
+    return () => {
+      window.removeEventListener('carritoActualizado', handleCarritoActualizado);
+    };
+  }, []);
+
+  const toggleMenu = () => setMenuOpen(!menuOpen);
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <header className="header">
@@ -38,15 +53,12 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
           <button 
             className="navbar-toggler" 
             type="button" 
-            onClick={toggleMenu} 
-            aria-controls="navbarNavDropdown" 
-            aria-expanded={menuOpen ? 'true' : 'false'} 
-            aria-label="Toggle navigation"
+            onClick={toggleMenu}
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-          <div className={`collapse navbar-collapse ${menuOpen ? 'show' : ''}`} id="navbarNavDropdown">
-            <ul className="navbar-nav">
+          <div className={`collapse navbar-collapse ${menuOpen ? 'show' : ''}`}>
+            <ul className="navbar-nav me-auto">
               <li className="nav-item">
                 <Link to="/cotizador" className="nav-link" onClick={closeMenu}>Cotiza</Link>
               </li>
@@ -64,6 +76,16 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
               </li>
               <li className="nav-item">
                 <Link to="/login" className="nav-link" onClick={closeMenu}>Inicio de Sesión</Link>
+              </li>
+              <li className="nav-item">
+                <button className="btn btn-outline-danger position-relative ms-2" onClick={() => { navigate('/carrito'); closeMenu(); }}>
+                  🛒
+                  {cartCount > 0 && (
+                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
               </li>
             </ul>
           </div>
