@@ -1,14 +1,35 @@
 from django.db import models
-
-# Create your models here.
+from django.contrib.auth.models import User
+from producto.models import Producto  # ajusta si tu app se llama diferente
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.conf import settings
 
 class Carrito(models.Model):
-    idCarrito = models.AutoField(primary_key=True)
-    #idUsuario = models.ForeignKey('usuarios.Usuario', on_delete=models.PROTECT)
-    #idProducto = models.ForeignKey('productos.Producto', on_delete=models.PROTECT, null=True, blank=True)
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  # ✅ referencia dinámica
+        on_delete=models.CASCADE,
+        related_name='carrito'
+    )
+    creado = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Carrito de {self.usuario.email or self.usuario.username} - {self.creado}"
+
+class ItemCarrito(models.Model):
+    carrito = models.ForeignKey(Carrito, on_delete=models.CASCADE, related_name='items')
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     cantidad = models.PositiveIntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_agregado = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Carrito {self.idCarrito} - Cantidad: {self.cantidad} - Precio Unitario: {self.precio_unitario}"
+        return f"{self.producto.nombreProducto} x{self.cantidad}"
+
+class VaciarCarritoView(APIView):
+    def delete(self, request, carrito_id):
+        items = ItemCarrito.objects.filter(carrito_id=carrito_id)
+        deleted_count = items.count()
+        items.delete()
+        return Response({'message': f'{deleted_count} items eliminados del carrito'}, status=status.HTTP_200_OK)

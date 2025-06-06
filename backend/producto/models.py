@@ -13,7 +13,6 @@ class Producto(models.Model):
     precioNeto = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.IntegerField()
     descripcion = models.TextField()
-    peso = models.DecimalField(max_digits=6, decimal_places=2)
 
     def __str__(self):
         return f"{self.idProducto}{self.nombreProducto} {self.precioProducto} {self.stock} {self.descripcion} "
