@@ -2,112 +2,131 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
-
-interface ProductoDetalle {
-  idProducto: string;
-  nombreProducto: string;
-  imagen?: string;
-}
+import Form from 'react-bootstrap/Form';
 
 interface Item {
   id: number;
-  producto: string;
-  producto_detalle?: ProductoDetalle;
+  producto_detalle: {
+    idProducto: string;
+    nombreProducto: string;
+    imagen?: string;
+  };
   cantidad: number;
   precio_unitario: string;
 }
 
-const Carrito: React.FC = () => {
+function Carrito() {
   const [items, setItems] = useState<Item[]>([]);
+  const [total, setTotal] = useState<number>(0);
 
-  const cargarCarrito = async () => {
+  const fetchCarrito = async () => {
     const token = localStorage.getItem('accessToken');
     if (!token) return;
+
     try {
       const response = await axios.get('http://127.0.0.1:8000/carrito/', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-      setItems(response.data[0]?.items || []);
+      const carrito = response.data[0];
+      setItems(carrito?.items || []);
     } catch (error) {
       console.error('Error al cargar carrito:', error);
     }
   };
 
-  const actualizarCantidad = (index: number, nuevaCantidad: number) => {
-    const nuevaLista = [...items];
-    nuevaLista[index].cantidad = nuevaCantidad;
+  useEffect(() => {
+    fetchCarrito();
+    window.addEventListener('carritoActualizado', fetchCarrito);
+    return () => {
+      window.removeEventListener('carritoActualizado', fetchCarrito);
+    };
+  }, []);
 
-    // Aquí puedes agregar un fetch PUT si el usuario está logeado
-    setItems(nuevaLista);
-  };
+  useEffect(() => {
+    const totalCalculado = items.reduce((acc, item) => acc + item.cantidad * parseFloat(item.precio_unitario), 0);
+    setTotal(totalCalculado);
+  }, [items]);
 
-  const eliminarItem = async (itemId: number) => {
+ const actualizarCantidad = async (id: number, nuevaCantidad: number) => {
+  const token = localStorage.getItem('accessToken');
+  const item = items.find(i => i.id === id);
+  if (!item || !token) return;
+
+  try {
+    await axios.put(
+      `http://127.0.0.1:8000/carrito/items/${id}/`,
+      {
+        carrito: localStorage.getItem('carritoId'), // ✅ incluye el ID del carrito
+        producto: item.producto_detalle.idProducto,
+        cantidad: nuevaCantidad,
+        precio_unitario: item.precio_unitario,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    const nuevosItems = items.map(i =>
+      i.id === id ? { ...i, cantidad: nuevaCantidad } : i
+    );
+    setItems(nuevosItems);
+  } catch (error) {
+    console.error('Error al actualizar cantidad:', error);
+    if (axios.isAxiosError(error)) {
+      console.error('Detalle del error del backend:', error.response?.data);
+    }
+  }
+};
+  const eliminarItem = async (id: number) => {
     const token = localStorage.getItem('accessToken');
     if (!token) return;
+
     try {
-      await axios.delete(`http://127.0.0.1:8000/carrito/items/${itemId}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      await axios.delete(`http://127.0.0.1:8000/carrito/items/${id}/`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      cargarCarrito();
+      setItems(items.filter(item => item.id !== id));
     } catch (error) {
-      console.error('Error al eliminar item del carrito:', error);
+      console.error('Error al eliminar item:', error);
     }
   };
 
-  useEffect(() => {
-    cargarCarrito();
-    window.addEventListener('carritoActualizado', cargarCarrito);
-    return () => window.removeEventListener('carritoActualizado', cargarCarrito);
-  }, []);
-
-  const calcularSubtotal = (item: Item) => {
-    return parseFloat(item.precio_unitario) * item.cantidad;
-  };
-
-  const totalCompra = items.reduce((acc, item) => acc + calcularSubtotal(item), 0);
-
   return (
-    <div className="container mt-4">
-      <h2>🛒 Carrito de Compras</h2>
-      <Table striped bordered hover responsive className="mt-3">
+    <div className="container mt-5">
+      <h2 className="text-danger mb-4">Carrito de Compras</h2>
+      <Table striped bordered hover responsive>
         <thead>
           <tr>
             <th>ID Producto</th>
             <th>Nombre</th>
-            <th>Precio Unitario</th>
+            <th>Precio</th>
             <th>Cantidad</th>
             <th>Subtotal</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {items.map((item, index) => (
+          {items.map((item) => (
             <tr key={item.id}>
-              <td>{item.producto_detalle?.idProducto || item.producto}</td>
-              <td>{item.producto_detalle?.nombreProducto || 'Producto'}</td>
+              <td>{item.producto_detalle?.idProducto}</td>
+              <td>{item.producto_detalle?.nombreProducto}</td>
               <td>${parseFloat(item.precio_unitario).toLocaleString()}</td>
-              <td>
-                <input
+              <td style={{ maxWidth: '100px' }}>
+                <Form.Control
                   type="number"
-                  min="1"
+                  min={1}
                   value={item.cantidad}
-                  onChange={(e) =>
-                    actualizarCantidad(index, parseInt(e.target.value))
-                  }
-                  style={{ width: '70px' }}
+                  onChange={(e) => actualizarCantidad(item.id, parseInt(e.target.value))}
                 />
               </td>
-              <td>${calcularSubtotal(item).toLocaleString()}</td>
               <td>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={() => eliminarItem(item.id)}
-                >
+                {(item.cantidad * parseFloat(item.precio_unitario)).toLocaleString('es-CL', {
+                  style: 'currency',
+                  currency: 'CLP',
+                })}
+              </td>
+              <td>
+                <Button variant="danger" size="sm" onClick={() => eliminarItem(item.id)}>
                   Eliminar
                 </Button>
               </td>
@@ -116,11 +135,12 @@ const Carrito: React.FC = () => {
         </tbody>
       </Table>
       <div className="text-end">
-        <h4>Total: ${totalCompra.toLocaleString()}</h4>
-        <Button variant="danger" className="mt-2">Proceder al pago</Button>
+        <h4>Total: {total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</h4>
+        <Button variant="danger"size="lg" className="mt-2">Proceder al pago</Button>
       </div>
     </div>
+    
   );
-};
+}
 
 export default Carrito;

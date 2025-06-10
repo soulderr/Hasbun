@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
 
 class CarritoListCreateView(generics.ListCreateAPIView):
     serializer_class = CarritoSerializer
@@ -75,3 +76,8 @@ class VaciarCarritoView(APIView):
         ItemCarrito.objects.filter(carrito=carrito).delete()
 
         return Response({'mensaje': 'Carrito vaciado exitosamente'}, status=status.HTTP_200_OK)
+
+class ItemCarritoDetalleView(RetrieveUpdateDestroyAPIView):
+    queryset = ItemCarrito.objects.all()
+    serializer_class = ItemCarritoSerializer
+    permission_classes = [IsAuthenticated]
