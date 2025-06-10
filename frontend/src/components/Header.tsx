@@ -78,7 +78,7 @@ const Header: React.FC = () => {
                 <Link to="/login" className="nav-link" onClick={closeMenu}>Inicio de Sesión</Link>
               </li>
               <li className="nav-item">
-                <button className="btn btn-outline-danger position-relative ms-2" onClick={() => { navigate('/carrito'); closeMenu(); }}>
+                <button className="btn btn-outline-danger position-relative ms-2" onClick={() => { navigate('/carrito/items'); closeMenu(); }}>
                   🛒
                   {cartCount > 0 && (
                     <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">

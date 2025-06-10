@@ -3,8 +3,7 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -14,18 +13,50 @@ function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // 🔐 Login: obtener access y refresh tokens
       const response = await axios.post('http://127.0.0.1:8000/login/', {
         email,
-        password
+        password,
       });
 
       const { access, refresh } = response.data;
       localStorage.setItem('accessToken', access);
       localStorage.setItem('refreshToken', refresh);
 
-      navigate('/dashboard'); // o la ruta que desees
+      // 🛒 Buscar carrito existente o crear uno nuevo
+      try {
+        const carritoResponse = await axios.get('http://127.0.0.1:8000/carrito/', {
+          headers: {
+            Authorization: `Bearer ${access}`,
+          },
+        });
+
+        if (Array.isArray(carritoResponse.data) && carritoResponse.data.length > 0) {
+          // ✅ Ya existe carrito
+          const carritoId = carritoResponse.data[0].id;
+          localStorage.setItem('carritoId', carritoId.toString());
+        } else {
+          // ➕ Crear nuevo carrito si no existe
+          const nuevoCarrito = await axios.post(
+            'http://127.0.0.1:8000/carrito/',
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${access}`,
+              },
+            }
+          );
+          localStorage.setItem('carritoId', nuevoCarrito.data.id.toString());
+        }
+      } catch (carritoError) {
+        console.error('❌ Error al obtener o crear el carrito:', carritoError);
+        alert('No se pudo establecer el carrito del usuario.');
+      }
+
+      // ✅ Redirigir al dashboard
+      navigate('/dashboard');
     } catch (error) {
-      console.error('Error en login:', error);
+      console.error('❌ Error en login:', error);
       alert('Credenciales incorrectas');
     }
   };

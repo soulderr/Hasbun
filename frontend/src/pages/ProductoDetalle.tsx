@@ -65,31 +65,72 @@ const ProductoDetalle: React.FC = () => {
     });
   };
 
-  const agregarAlCarrito = () => {
-    if (!product) return;
+  const agregarAlCarrito = async () => {
+  if (!product) return;
 
-    const item = {
-      idProducto: product.idProducto,
-      nombreProducto: product.nombreProducto,
-      imagen: product.imagen,
-      precio: parseFloat(product.precioNeto),
-      cantidad: 1,
-    };
+  const accessToken = localStorage.getItem('accessToken');
+  const carritoId = localStorage.getItem('carritoId');
 
+  const item = {
+    carrito: parseInt(carritoId!), // conviértelo a número si es string
+    producto: product.idProducto,
+    cantidad: 1,
+    precio_unitario: parseFloat(product.precioNeto),
+  };
+
+  console.log("🟨 Item a enviar:", item);
+  
+  if (accessToken && item.carrito) {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/carrito/items/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(item),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('🔴 Error del backend:', errorData);
+        throw new Error(JSON.stringify(errorData));
+      }
+
+      window.dispatchEvent(new Event('carritoActualizado'));
+      alert('Producto agregado al carrito (usuario autenticado)');
+    } catch (error) {
+      console.error('❌ Error al agregar al carrito autenticado:', error);
+      alert('No se pudo agregar el producto al carrito (autenticado)');
+    }
+
+  } else {
+    // Usuario invitado
     const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
 
-    const indiceExistente = carrito.findIndex((p: any) => p.idProducto === item.idProducto);
+    const indiceExistente = carrito.findIndex(
+      (p: any) => p.idProducto === product.idProducto
+    );
 
     if (indiceExistente !== -1) {
       carrito[indiceExistente].cantidad += 1;
     } else {
-      carrito.push(item);
+      carrito.push({
+        idProducto: product.idProducto,
+        nombreProducto: product.nombreProducto,
+        imagen: product.imagen,
+        precio: parseFloat(product.precioNeto),
+        cantidad: 1,
+      });
     }
 
     localStorage.setItem('carrito', JSON.stringify(carrito));
     window.dispatchEvent(new Event('carritoActualizado'));
-    alert('Producto agregado al carrito');
-  };
+    alert('Producto agregado al carrito (sin sesión)');
+  }
+};
+
+
 
   if (loading) {
     return <div className="producto-detalle"><p>Cargando detalles del producto...</p></div>;

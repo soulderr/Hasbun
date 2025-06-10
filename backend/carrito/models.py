@@ -7,15 +7,12 @@ from rest_framework import status
 from django.conf import settings
 
 class Carrito(models.Model):
-    usuario = models.ForeignKey(
-        settings.AUTH_USER_MODEL,  # ✅ referencia dinámica
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='carrito'
     )
     creado = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Carrito de {self.usuario.email or self.usuario.username} - {self.creado}"
 
 class ItemCarrito(models.Model):
     carrito = models.ForeignKey(Carrito, on_delete=models.CASCADE, related_name='items')

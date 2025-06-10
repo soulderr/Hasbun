@@ -39,7 +39,7 @@ function App() {
             <Route path="/dashboard" element={ <Dashboard />} />
             <Route path="/restablecer-password/:uid/:token/" element={<ResetPassword />} />
             <Route path="/recuperar" element={<OlvidePassword />} />
-            <Route path="/carrito" element={<Carrito />} />
+            <Route path="/carrito/items" element={<Carrito />} />
             {/* Agrega más rutas según sea necesario */}
           </Routes>
         </main>

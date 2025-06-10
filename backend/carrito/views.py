@@ -4,22 +4,51 @@ from .serializers import CarritoSerializer, ItemCarritoSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 class CarritoListCreateView(generics.ListCreateAPIView):
-    queryset = Carrito.objects.all()
     serializer_class = CarritoSerializer
+
+    def get_queryset(self):
+        return Carrito.objects.filter(usuario=self.request.user)
+
 
 
 class ItemCarritoListCreateView(generics.ListCreateAPIView):
-    queryset = ItemCarrito.objects.all()
     serializer_class = ItemCarritoSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return ItemCarrito.objects.filter(carrito__usuario=self.request.user)
+
+    def perform_create(self, serializer):
+        usuario = self.request.user
+
+        # Verificar si ya tiene un carrito
+        carrito, creado = Carrito.objects.get_or_create(usuario=usuario)
+
+        producto = serializer.validated_data['producto']
+        cantidad = serializer.validated_data['cantidad']
+        precio_unitario = serializer.validated_data['precio_unitario']
+
+        # Verificar si ya existe ese producto en el carrito
+        item_existente = ItemCarrito.objects.filter(carrito=carrito, producto=producto).first()
+
+        if item_existente:
+            # Si ya existe, aumentar la cantidad
+            item_existente.cantidad += cantidad
+            item_existente.save()
+        else:
+            # Si no, crear uno nuevo
+            serializer.save(carrito=carrito)
 
 class ItemCarritoListView(generics.ListAPIView):
     serializer_class = ItemCarritoSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        carrito_id = self.request.query_params.get('carrito')
-        return ItemCarrito.objects.filter(carrito_id=carrito_id)
+        carrito, creado = Carrito.objects.get_or_create(usuario=self.request.user)
+        return ItemCarrito.objects.filter(carrito=carrito)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
@@ -29,6 +58,7 @@ class ItemCarritoListView(generics.ListAPIView):
             "items": serializer.data,
             "total": f"{total:.2f}"
         })
+
     
 class ItemCarritoDetailView(generics.RetrieveDestroyAPIView):
     queryset = ItemCarrito.objects.all()
