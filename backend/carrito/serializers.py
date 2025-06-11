@@ -14,19 +14,33 @@ class ProductoMiniSerializer(serializers.ModelSerializer):
         fields = ['idProducto', 'nombreProducto', 'imagen']
 
 class ItemCarritoSerializer(serializers.ModelSerializer):
-    producto = serializers.PrimaryKeyRelatedField(queryset=Producto.objects.all())
+    producto = serializers.PrimaryKeyRelatedField(
+        queryset=Producto.objects.all(),
+        required=False  # Para permitir PUT sin reenviar producto
+    )
     producto_detalle = ProductoMiniSerializer(source='producto', read_only=True)
+    precio_unitario = serializers.DecimalField(
+        max_digits=10, decimal_places=2, read_only=True
+    )  # 👈 clave: marcar como solo lectura
 
     class Meta:
         model = ItemCarrito
-        fields = ['id', 'carrito', 'producto', 'producto_detalle', 'cantidad', 'precio_unitario', 'fecha_agregado']
+        fields = [
+            'id',
+            'carrito',
+            'producto',
+            'producto_detalle',
+            'cantidad',
+            'precio_unitario',
+            'fecha_agregado'
+        ]
         read_only_fields = ['carrito', 'fecha_agregado']
     
-
     def update(self, instance, validated_data):
         instance.cantidad = validated_data.get('cantidad', instance.cantidad)
         instance.save()
         return instance
+
 
 
 class CarritoSerializer(serializers.ModelSerializer):

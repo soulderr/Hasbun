@@ -109,7 +109,6 @@ const Carrito: React.FC = () => {
                       onChange={e =>
                         actualizarCantidad(item.id, parseInt(e.target.value))
                       }
-                      style={{ width: '80px' }}
                     />
                   </td>
                   <td>${parseFloat(item.precio_unitario.toString()).toLocaleString('es-CL')}</td>

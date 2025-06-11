@@ -53,13 +53,17 @@ export const actualizarCantidadThunk = createAsyncThunk(
   'carrito/actualizarCantidad',
   async ({ id, cantidad }: { id: number; cantidad: number }, thunkAPI) => {
     try {
-      await api.put(`/carrito/items/${id}/`, { cantidad });
+      const response = await api.put(`/carrito/items/${id}/`, { cantidad });
+      console.log('✅ Cantidad actualizada:', response.data);
       thunkAPI.dispatch(fetchCarrito());
     } catch (error: any) {
+      console.error('❌ Error al actualizar cantidad:', error.response?.data);
       return thunkAPI.rejectWithValue(error.response?.data || 'Error al actualizar cantidad');
     }
   }
 );
+
+
 
 // Eliminar item
 export const eliminarItemThunk = createAsyncThunk(
