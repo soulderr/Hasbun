@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import axios from 'axios';
+import api from './axiosConfig'; 
 import './Registro.css';
 const API_URL = 'http://127.0.0.1:8000/registro/';
 
@@ -34,7 +34,7 @@ function Registro() {
     }
 
     try {
-      const response = await axios.post(API_URL, {
+      const response = await api.post(API_URL, {
         username: formData.email,
         email: formData.email,
         password: formData.password,

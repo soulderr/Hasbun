@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import axios from 'axios';
+import api from './axiosConfig'; 
+
 import { useNavigate, Link } from 'react-router-dom';
 
 function Login() {
@@ -14,7 +15,7 @@ function Login() {
     e.preventDefault();
     try {
       // 🔐 Login: obtener access y refresh tokens
-      const response = await axios.post('http://127.0.0.1:8000/login/', {
+      const response = await api.post('http://127.0.0.1:8000/login/', {
         email,
         password,
       });
@@ -25,7 +26,7 @@ function Login() {
 
       // 🛒 Buscar carrito existente o crear uno nuevo
       try {
-        const carritoResponse = await axios.get('http://127.0.0.1:8000/carrito/', {
+        const carritoResponse = await api.get('http://127.0.0.1:8000/carrito/', {
           headers: {
             Authorization: `Bearer ${access}`,
           },
@@ -37,7 +38,7 @@ function Login() {
           localStorage.setItem('carritoId', carritoId.toString());
         } else {
           // ➕ Crear nuevo carrito si no existe
-          const nuevoCarrito = await axios.post(
+          const nuevoCarrito = await api.post(
             'http://127.0.0.1:8000/carrito/',
             {},
             {

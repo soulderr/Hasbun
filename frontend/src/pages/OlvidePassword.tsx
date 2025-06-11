@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
-import axios from 'axios';
+
 import Spinner from 'react-bootstrap/Spinner';
 
 function OlvidePassword() {
@@ -20,7 +20,7 @@ function OlvidePassword() {
 
     try {
       setLoading(true);
-      await axios.post('http://127.0.0.1:8000/usuarios/solicitar-recuperacion/', { email });
+      await api.post('http://127.0.0.1:8000/usuarios/solicitar-recuperacion/', { email });
       setMessage('Si el correo está registrado, se ha enviado un enlace para restablecer tu contraseña.');
     } catch (err: any) {
       if (err.response && err.response.status === 400) {

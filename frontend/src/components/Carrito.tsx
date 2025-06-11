@@ -1,146 +1,192 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import {
+  fetchCarrito,
+  actualizarCantidadThunk,
+  eliminarItemThunk,
+} from '../store/slice/carritoSlice';
 import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import { RootState } from '../store';
 
-interface Item {
-  id: number;
-  producto_detalle: {
-    idProducto: string;
-    nombreProducto: string;
-    imagen?: string;
-  };
+interface ProductoInvitado {
+  idProducto: string;
+  nombreProducto: string;
+  imagen?: string | null;
+  precio: number;
   cantidad: number;
-  precio_unitario: string;
 }
 
-function Carrito() {
-  const [items, setItems] = useState<Item[]>([]);
-  const [total, setTotal] = useState<number>(0);
+const Carrito: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { items, total, loading } = useAppSelector((state: RootState) => state.carrito);
+  console.log('🛒 Items autenticado:', items);
+  const [carritoInvitado, setCarritoInvitado] = useState<ProductoInvitado[]>([]);
+  const isAuthenticated = Boolean(localStorage.getItem('accessToken'));
 
-  const fetchCarrito = async () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
+  useEffect(() => {
+    const cargarCarrito = () => {
+      if (isAuthenticated) {
+        dispatch(fetchCarrito());
+      } else {
+        const localCarrito = localStorage.getItem('carrito');
+        setCarritoInvitado(localCarrito ? JSON.parse(localCarrito) : []);
+      }
+    };
 
-    try {
-      const response = await axios.get('http://127.0.0.1:8000/carrito/', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const carrito = response.data[0];
-      setItems(carrito?.items || []);
-    } catch (error) {
-      console.error('Error al cargar carrito:', error);
-    }
+    cargarCarrito();
+    window.addEventListener('carritoActualizado', cargarCarrito);
+
+    return () => {
+      window.removeEventListener('carritoActualizado', cargarCarrito);
+    };
+  }, [dispatch, isAuthenticated]);
+
+  const actualizarCantidad = (id: number, cantidad: number) => {
+    dispatch(actualizarCantidadThunk({ id, cantidad }));
   };
 
-  useEffect(() => {
-    fetchCarrito();
-    window.addEventListener('carritoActualizado', fetchCarrito);
-    return () => {
-      window.removeEventListener('carritoActualizado', fetchCarrito);
-    };
-  }, []);
+  const eliminarItem = (id: number) => {
+    dispatch(eliminarItemThunk(id));
+  };
 
-  useEffect(() => {
-    const totalCalculado = items.reduce((acc, item) => acc + item.cantidad * parseFloat(item.precio_unitario), 0);
-    setTotal(totalCalculado);
-  }, [items]);
-
- const actualizarCantidad = async (id: number, nuevaCantidad: number) => {
-  const token = localStorage.getItem('accessToken');
-  const item = items.find(i => i.id === id);
-  if (!item || !token) return;
-
-  try {
-    await axios.put(
-      `http://127.0.0.1:8000/carrito/items/${id}/`,
-      {
-        carrito: localStorage.getItem('carritoId'), // ✅ incluye el ID del carrito
-        producto: item.producto_detalle.idProducto,
-        cantidad: nuevaCantidad,
-        precio_unitario: item.precio_unitario,
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
+  const actualizarCantidadInvitado = (idProducto: string, cantidad: number) => {
+    const nuevoCarrito = carritoInvitado.map(item =>
+      item.idProducto === idProducto ? { ...item, cantidad } : item
     );
+    setCarritoInvitado(nuevoCarrito);
+    localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
+  };
 
-    const nuevosItems = items.map(i =>
-      i.id === id ? { ...i, cantidad: nuevaCantidad } : i
-    );
-    setItems(nuevosItems);
-  } catch (error) {
-    console.error('Error al actualizar cantidad:', error);
-    if (axios.isAxiosError(error)) {
-      console.error('Detalle del error del backend:', error.response?.data);
-    }
-  }
-};
-  const eliminarItem = async (id: number) => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) return;
+  const eliminarItemInvitado = (idProducto: string) => {
+    const nuevoCarrito = carritoInvitado.filter(item => item.idProducto !== idProducto);
+    setCarritoInvitado(nuevoCarrito);
+    localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
+  };
 
-    try {
-      await axios.delete(`http://127.0.0.1:8000/carrito/items/${id}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setItems(items.filter(item => item.id !== id));
-    } catch (error) {
-      console.error('Error al eliminar item:', error);
-    }
+  const calcularTotalInvitado = () => {
+    return carritoInvitado.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
   };
 
   return (
-    <div className="container mt-5">
-      <h2 className="text-danger mb-4">Carrito de Compras</h2>
-      <Table striped bordered hover responsive>
+    <div className="container mt-4">
+      <h2>Carrito de Compras</h2>
+
+      {loading && isAuthenticated && <p>Cargando carrito...</p>}
+
+      <Table striped bordered hover responsive className="mt-3">
         <thead>
           <tr>
-            <th>ID Producto</th>
+            <th>Imagen</th>
             <th>Nombre</th>
-            <th>Precio</th>
             <th>Cantidad</th>
+            <th>Precio Unitario</th>
             <th>Subtotal</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => (
-            <tr key={item.id}>
-              <td>{item.producto_detalle?.idProducto}</td>
-              <td>{item.producto_detalle?.nombreProducto}</td>
-              <td>${parseFloat(item.precio_unitario).toLocaleString()}</td>
-              <td style={{ maxWidth: '100px' }}>
-                <Form.Control
-                  type="number"
-                  min={1}
-                  value={item.cantidad}
-                  onChange={(e) => actualizarCantidad(item.id, parseInt(e.target.value))}
-                />
-              </td>
-              <td>
-                {(item.cantidad * parseFloat(item.precio_unitario)).toLocaleString('es-CL', {
-                  style: 'currency',
-                  currency: 'CLP',
-                })}
-              </td>
-              <td>
-                <Button variant="danger" size="sm" onClick={() => eliminarItem(item.id)}>
-                  Eliminar
-                </Button>
-              </td>
-            </tr>
-          ))}
+          {isAuthenticated
+            ? items.map(item => (
+                <tr key={item.id}>
+                  <td>
+                    <img
+                      src={
+                        item.producto_detalle?.imagen ??
+                        `https://via.placeholder.com/100x100?text=Producto`
+                      }
+                      alt={item.producto_detalle?.nombreProducto}
+                      width="60"
+                    />
+                  </td>
+                  <td>{item.producto_detalle?.nombreProducto || 'Sin nombre'}</td>
+                  <td>
+                    <Form.Control
+                      type="number"
+                      min={1}
+                      value={item.cantidad}
+                      onChange={e =>
+                        actualizarCantidad(item.id, parseInt(e.target.value))
+                      }
+                      style={{ width: '80px' }}
+                    />
+                  </td>
+                  <td>${parseFloat(item.precio_unitario.toString()).toLocaleString('es-CL')}</td>
+                  <td>
+                    $
+                    {(
+                      item.cantidad * parseFloat(item.precio_unitario.toString())
+                    ).toLocaleString('es-CL')}
+                  </td>
+                  <td>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => eliminarItem(item.id)}
+                    >
+                      Eliminar
+                    </Button>
+                  </td>
+                </tr>
+              ))
+            : carritoInvitado.map(item => (
+                <tr key={item.idProducto}>
+                  <td>
+                    <img
+                      src={
+                        item.imagen ??
+                        `https://via.placeholder.com/100x100?text=Producto`
+                      }
+                      alt={item.nombreProducto}
+                      width="60"
+                    />
+                  </td>
+                  <td>{item.nombreProducto}</td>
+                  <td>
+                    <Form.Control
+                      type="number"
+                      min={1}
+                      value={item.cantidad}
+                      onChange={e =>
+                        actualizarCantidadInvitado(
+                          item.idProducto,
+                          parseInt(e.target.value)
+                        )
+                      }
+                      style={{ width: '80px' }}
+                    />
+                  </td>
+                  <td>${item.precio.toLocaleString('es-CL')}</td>
+                  <td>${(item.precio * item.cantidad).toLocaleString('es-CL')}</td>
+                  <td>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => eliminarItemInvitado(item.idProducto)}
+                    >
+                      Eliminar
+                    </Button>
+                  </td>
+                </tr>
+              ))}
         </tbody>
       </Table>
+
       <div className="text-end">
-        <h4>Total: {total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</h4>
+        <h4>
+          Total:{' '}
+          <span className="text-success">
+            $
+            {isAuthenticated
+              ? total.toLocaleString('es-CL')
+              : calcularTotalInvitado().toLocaleString('es-CL')}
+          </span>
+        </h4>
         <Button variant="danger"size="lg" className="mt-2">Proceder al pago</Button>
       </div>
     </div>
-    
   );
-}
+};
 
 export default Carrito;

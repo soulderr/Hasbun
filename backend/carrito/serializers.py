@@ -20,7 +20,8 @@ class ItemCarritoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemCarrito
         fields = ['id', 'carrito', 'producto', 'producto_detalle', 'cantidad', 'precio_unitario', 'fecha_agregado']
-        read_only_fields = ['fecha_agregado']
+        read_only_fields = ['carrito', 'fecha_agregado']
+    
 
     def update(self, instance, validated_data):
         instance.cantidad = validated_data.get('cantidad', instance.cantidad)

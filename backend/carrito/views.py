@@ -60,6 +60,7 @@ class ItemCarritoListView(generics.ListAPIView):
             "total": f"{total:.2f}"
         })
 
+
     
 class ItemCarritoDetailView(generics.RetrieveDestroyAPIView):
     queryset = ItemCarrito.objects.all()

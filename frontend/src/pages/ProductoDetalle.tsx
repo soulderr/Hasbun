@@ -72,15 +72,14 @@ const ProductoDetalle: React.FC = () => {
   const carritoId = localStorage.getItem('carritoId');
 
   const item = {
-    carrito: parseInt(carritoId!), // conviértelo a número si es string
-    producto: product.idProducto,
-    cantidad: 1,
-    precio_unitario: parseFloat(product.precioNeto),
-  };
+  producto: product.idProducto,
+  cantidad: 1,
+  precio_unitario: parseFloat(product.precioNeto),
+};
 
   console.log("🟨 Item a enviar:", item);
   
-  if (accessToken && item.carrito) {
+  if (accessToken ) {
     try {
       const response = await fetch('http://127.0.0.1:8000/carrito/items/', {
         method: 'POST',
