@@ -1,40 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './header.css';
-import { FaShoppingCart } from 'react-icons/fa';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { fetchCarrito } from '../store/slice/carritoSlice';
 
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  // Leer y contar productos del carrito desde localStorage
-  const updateCartCount = () => {
+  const isAuthenticated = Boolean(localStorage.getItem('accessToken'));
+  const cantidadTotal = useAppSelector(state => state.carrito.cantidadTotal);
+
+  const [cartCountInvitado, setCartCountInvitado] = useState(0);
+
+  const updateCartCountInvitado = () => {
     const carrito = localStorage.getItem('carrito');
     if (carrito) {
       try {
         const items = JSON.parse(carrito);
         const total = items.reduce((acc: number, item: any) => acc + item.cantidad, 0);
-        setCartCount(total);
+        setCartCountInvitado(total);
       } catch {
-        setCartCount(0);
+        setCartCountInvitado(0);
       }
     } else {
-      setCartCount(0);
+      setCartCountInvitado(0);
     }
   };
 
   useEffect(() => {
-    updateCartCount();
+    if (isAuthenticated) {
+      dispatch(fetchCarrito());
+    } else {
+      updateCartCountInvitado();
+    }
 
-    // Escuchar eventos de actualización del carrito
-    const handleCarritoActualizado = () => updateCartCount();
-    window.addEventListener('carritoActualizado', handleCarritoActualizado);
-
-    return () => {
-      window.removeEventListener('carritoActualizado', handleCarritoActualizado);
+    const handleCarritoActualizado = () => {
+      if (isAuthenticated) {
+        dispatch(fetchCarrito());
+      } else {
+        updateCartCountInvitado();
+      }
     };
-  }, []);
+
+    window.addEventListener('carritoActualizado', handleCarritoActualizado);
+    return () => window.removeEventListener('carritoActualizado', handleCarritoActualizado);
+  }, [dispatch, isAuthenticated]);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const closeMenu = () => setMenuOpen(false);
@@ -50,11 +62,7 @@ const Header: React.FC = () => {
               className="navImage"
             />
           </Link>
-          <button 
-            className="navbar-toggler" 
-            type="button" 
-            onClick={toggleMenu}
-          >
+          <button className="navbar-toggler" type="button" onClick={toggleMenu}>
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className={`collapse navbar-collapse ${menuOpen ? 'show' : ''}`}>
@@ -78,11 +86,17 @@ const Header: React.FC = () => {
                 <Link to="/login" className="nav-link" onClick={closeMenu}>Inicio de Sesión</Link>
               </li>
               <li className="nav-item">
-                <button className="btn btn-outline-danger position-relative ms-2" onClick={() => { navigate('/carrito/items'); closeMenu(); }}>
+                <button
+                  className="btn btn-outline-danger position-relative ms-2"
+                  onClick={() => {
+                    navigate('/carrito/items');
+                    closeMenu();
+                  }}
+                >
                   🛒
-                  {cartCount > 0 && (
+                  {(isAuthenticated ? cantidadTotal : cartCountInvitado) > 0 && (
                     <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                      {cartCount}
+                      {isAuthenticated ? cantidadTotal : cartCountInvitado}
                     </span>
                   )}
                 </button>

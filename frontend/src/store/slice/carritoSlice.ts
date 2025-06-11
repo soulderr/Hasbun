@@ -25,6 +25,7 @@ interface CarritoResponse {
 interface CarritoState {
   items: ItemCarrito[];
   total: number;
+  cantidadTotal: number; 
   loading: boolean;
   error: string | null;
 }
@@ -32,10 +33,10 @@ interface CarritoState {
 const initialState: CarritoState = {
   items: [],
   total: 0,
+  cantidadTotal: 0, 
   loading: false,
   error: null,
 };
-
 // Fetch del carrito para usuario autenticado
 export const fetchCarrito = createAsyncThunk('carrito/fetchCarrito', async (_, thunkAPI) => {
   try {
@@ -92,6 +93,10 @@ const carritoSlice = createSlice({
         state.loading = false;
         state.items = action.payload.items || [];
         state.total = parseFloat(action.payload.total);
+        state.cantidadTotal = action.payload.items.reduce(
+          (acc: number, item: ItemCarrito) => acc + item.cantidad,
+          0
+        );
       })
       .addCase(fetchCarrito.rejected, (state, action) => {
         state.loading = false;
