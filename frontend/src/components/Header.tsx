@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './header.css';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { fetchCarrito } from '../store/slice/carritoSlice';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -68,9 +69,6 @@ const Header: React.FC = () => {
           <div className={`collapse navbar-collapse ${menuOpen ? 'show' : ''}`}>
             <ul className="navbar-nav me-auto">
               <li className="nav-item">
-                <Link to="/cotizador" className="nav-link" onClick={closeMenu}>Cotiza</Link>
-              </li>
-              <li className="nav-item">
                 <Link to="/categoria" className="nav-link" onClick={closeMenu}>Productos</Link>
               </li>
               <li className="nav-item">
@@ -100,6 +98,17 @@ const Header: React.FC = () => {
                     </span>
                   )}
                 </button>
+              </li> 
+               <li className="nav-item d-none d-lg-block mx-auto">
+                <a
+                  href="https://wa.me/56912345678" // reemplaza con el número de tu empresa
+                  className="nav-link text-success d-flex align-items-center"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <FaWhatsapp size={24} style={{ marginRight: '5px' }} />
+                  Contactar por WhatsApp
+                </a>
               </li>
             </ul>
           </div>

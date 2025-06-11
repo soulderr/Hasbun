@@ -9,7 +9,6 @@ import Registro from './pages/Registro';
 import Login from './pages/Login';
 import Inventario from './pages/Inventario';
 import Contacto from './pages/Contacto';
-import Cotizador from './pages/Cotizador';
 import ProductoDetalle from './pages/ProductoDetalle'; // Importa el componente de detalles del producto
 import './App.css';
 import Dashboard from './pages/Dashboard';
@@ -18,6 +17,7 @@ import CategoriaProducto from './pages/CategoriaProducto';
 import ResetPassword from './pages/ResetPassword';
 import OlvidePassword from './pages/OlvidePassword';
 import Carrito from './components/Carrito';
+import { FaWhatsapp } from 'react-icons/fa';
 
 function App() {
   return (
@@ -35,7 +35,6 @@ function App() {
             <Route path="/registro" element={<Registro />} />
             <Route path="/inventario" element={<Inventario />} />
             <Route path="/contacto" element={<Contacto />} />
-            <Route path="/cotizador" element={<Cotizador />} />
             <Route path="/dashboard" element={ <Dashboard />} />
             <Route path="/restablecer-password/:uid/:token/" element={<ResetPassword />} />
             <Route path="/recuperar" element={<OlvidePassword />} />
@@ -44,6 +43,15 @@ function App() {
           </Routes>
         </main>
         <Footer />
+      </div>
+      <div className="whatsapp-float d-none d-lg-block">
+        <a
+          href="https://wa.me/56912345678"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <FaWhatsapp size={77} />
+        </a>
       </div>
     </Router>
   );

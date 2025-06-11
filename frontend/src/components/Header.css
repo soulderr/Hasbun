@@ -10,3 +10,15 @@
 .navbar {
   padding: 0.5rem 1rem; /* Ajusta el padding según sea necesario */
 }
+
+.whatsapp-icon {
+  position: absolute;
+  right: 20px;
+  top: 12px;
+  z-index: 999;
+  transition: transform 0.2s ease;
+}
+
+.whatsapp-icon:hover {
+  transform: scale(1.1);
+}
