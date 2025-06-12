@@ -31,6 +31,7 @@ urlpatterns = [
     path('detalleVenta/', include('detalleVenta.urls')),
     path('venta/', include('venta.urls')),
     path('metodoPago/', include('metodoPago.urls')),
+    path('fichatecnica/', include('fichaTecnica.urls')),
     path('registro/', RegisterView.as_view()),
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

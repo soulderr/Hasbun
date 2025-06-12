@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'detalleVenta',
     'venta',
     'metodoPago',
+    'fichaTecnica',
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',

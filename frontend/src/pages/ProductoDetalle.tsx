@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import './ProductoDetalle.css';
 
+interface FichaTecnica {
+  id: number;
+  nombre: string;
+  archivo_pdf: string;
+}
+
 interface ApiProduct {
   idProducto: string;
   nombreProducto: string;
@@ -11,7 +17,7 @@ interface ApiProduct {
   stock: number;
   descripcion: string;
   id_categoria: number;
-  archivo_pdf?: string;
+  ficha_tecnica?: FichaTecnica | null;  
 }
 
 const ProductoDetalle: React.FC = () => {
@@ -90,7 +96,6 @@ const ProductoDetalle: React.FC = () => {
         },
         body: JSON.stringify(item),
       });
-      console.log("📄 URL del PDF:", product.archivo_pdf);
       if (!response.ok) {
         const errorData = await response.json();
         console.error('🔴 Error del backend:', errorData);
@@ -130,7 +135,7 @@ const ProductoDetalle: React.FC = () => {
   }
 };
 
-
+  console.log(product)
 
   if (loading) {
     return <div className="producto-detalle"><p>Cargando detalles del producto...</p></div>;
@@ -145,13 +150,24 @@ const ProductoDetalle: React.FC = () => {
   }
 
   const descargarFichaTecnica = () => {
-  const link = document.createElement('a');
-  link.href = `http://127.0.0.1:8000/media/productos/pdfs/Soleras.pdf`;
-  link.download = 'ficha_tecnica.pdf'; // Puedes poner un nombre más descriptivo
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+    const nombreArchivo = product?.ficha_tecnica?.archivo_pdf?.split('/').pop();
+
+    if (!nombreArchivo) {
+      alert('Este producto no tiene ficha técnica disponible.');
+      return;
+    }
+
+    const url = `http://127.0.0.1:8000/fichatecnica/descargar-pdf/${nombreArchivo}`;
+
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', nombreArchivo); // nombre del archivo original
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
 
   return (
     <div className="producto-detalle">
@@ -176,13 +192,9 @@ const ProductoDetalle: React.FC = () => {
           </svg> Agregar al carrito
         </button>
         <button className="btn btn-outline-danger">Comprar</button>
-        <a
-          href={`http://127.0.0.1:8000/producto/descargar-pdf/${product.archivo_pdf?.split('/').pop()}`}
-          className="btn btn-outline-danger"
-          download
-        >
+        <button className="btn btn-outline-danger" onClick={descargarFichaTecnica}>
           Descargar ficha técnica
-        </a>
+        </button>
       </div>
     </div>
   );
