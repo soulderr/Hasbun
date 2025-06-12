@@ -17,6 +17,7 @@ import CategoriaProducto from './pages/CategoriaProducto';
 import ResetPassword from './pages/ResetPassword';
 import OlvidePassword from './pages/OlvidePassword';
 import Carrito from './components/Carrito';
+import Visitanos from './pages/Visitanos';
 import { FaWhatsapp } from 'react-icons/fa';
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
             <Route path="/restablecer-password/:uid/:token/" element={<ResetPassword />} />
             <Route path="/recuperar" element={<OlvidePassword />} />
             <Route path="/carrito/items" element={<Carrito />} />
+            <Route path="/visitanos" element={<Visitanos />} />
             {/* Agrega más rutas según sea necesario */}
           </Routes>
         </main>

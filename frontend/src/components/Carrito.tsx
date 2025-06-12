@@ -78,7 +78,7 @@ const Carrito: React.FC = () => {
       <Table striped bordered hover responsive className="mt-3">
         <thead>
           <tr>
-            <th>Imagen</th>
+            <th>Id Producto</th>
             <th>Nombre</th>
             <th>Cantidad</th>
             <th>Precio Unitario</th>
@@ -91,14 +91,7 @@ const Carrito: React.FC = () => {
             ? items.map(item => (
                 <tr key={item.id}>
                   <td>
-                    <img
-                      src={
-                        item.producto_detalle?.imagen ??
-                        `https://via.placeholder.com/100x100?text=Producto`
-                      }
-                      alt={item.producto_detalle?.nombreProducto}
-                      width="60"
-                    />
+                    {item.producto }
                   </td>
                   <td>{item.producto_detalle?.nombreProducto || 'Sin nombre'}</td>
                   <td>

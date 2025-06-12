@@ -78,6 +78,9 @@ const Header: React.FC = () => {
                 <Link to="/contacto" className="nav-link" onClick={closeMenu}>Contacto</Link>
               </li>
               <li className="nav-item">
+                <Link to="/visitanos" className="nav-link" onClick={closeMenu}>Visitanos</Link>
+              </li>
+              <li className="nav-item">
                 <Link to="/registro" className="nav-link" onClick={closeMenu}>Registrarse</Link>
               </li>
               <li className="nav-item">
@@ -101,7 +104,7 @@ const Header: React.FC = () => {
               </li> 
                <li className="nav-item d-none d-lg-block mx-auto">
                 <a
-                  href="https://wa.me/56912345678" // reemplaza con el número de tu empresa
+                  href="https://wa.me/56977146357" // reemplaza con el número de tu empresa
                   className="nav-link text-success d-flex align-items-center"
                   target="_blank"
                   rel="noopener noreferrer"

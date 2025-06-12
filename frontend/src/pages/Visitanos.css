@@ -1,0 +1,105 @@
+.visitanos-container {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  max-height: 70vh; /* Limita la altura máxima de la clase */
+  overflow-y: auto; /* Permite el desplazamiento vertical */
+  width: 55%;
+  box-sizing: border-box;
+}
+
+.titulo {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  color: #333;
+  word-wrap: break-word;
+  padding: 0 1rem;
+}
+
+.mapa-container {
+  width: 100%;
+  height: auto;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.mapa-container iframe {
+  width: 100%;
+  height: 350px;
+  border: 0;
+}
+
+.contacto-info {
+  text-align: center;
+  font-size: 1.1rem;
+  padding: 0 1rem;
+}
+
+.contacto-info a {
+  color: #25d366;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Mejoras específicas para tablets pequeñas y móviles */
+@media (max-width: 1024px) {
+  .titulo {
+    font-size: 2rem;
+  }
+
+  .contacto-info {
+    font-size: 1rem;
+  }
+
+  .mapa-container iframe {
+    height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .titulo {
+    font-size: 1.7rem;
+  }
+
+  .mapa-container iframe {
+    height: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .titulo {
+    font-size: 1.4rem;
+  }
+
+  .mapa-container iframe {
+    height: 250px;
+  }
+
+  .contacto-info {
+    font-size: 0.95rem;
+  }
+}
+
+.contacto-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.contacto-info {
+  text-align: center;
+  font-size: 1.1rem;
+  min-width: 240px;
+}
+
+.contacto-info a {
+  color: #25d366;
+  text-decoration: none;
+  font-weight: bold;
+}
+
