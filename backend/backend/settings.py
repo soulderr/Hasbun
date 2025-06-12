@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -144,11 +144,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
-#import os
 
 # Configuración de archivos estáticos
-#MEDIA_URL = '/media/'  # Ruta para acceder a archivos
-#MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Carpeta donde se almacenan
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 AUTH_USER_MODEL = 'usuarios.Usuario'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

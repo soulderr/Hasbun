@@ -11,6 +11,7 @@ interface ApiProduct {
   stock: number;
   descripcion: string;
   id_categoria: number;
+  archivo_pdf?: string;
 }
 
 const ProductoDetalle: React.FC = () => {
@@ -18,7 +19,7 @@ const ProductoDetalle: React.FC = () => {
   const [product, setProduct] = useState<ApiProduct | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  
   useEffect(() => {
     const fetchProductDetails = async () => {
       if (!id) {
@@ -64,7 +65,7 @@ const ProductoDetalle: React.FC = () => {
       maximumFractionDigits: 0,
     });
   };
-
+  
   const agregarAlCarrito = async () => {
   if (!product) return;
 
@@ -89,7 +90,7 @@ const ProductoDetalle: React.FC = () => {
         },
         body: JSON.stringify(item),
       });
-
+      console.log("📄 URL del PDF:", product.archivo_pdf);
       if (!response.ok) {
         const errorData = await response.json();
         console.error('🔴 Error del backend:', errorData);
@@ -143,6 +144,15 @@ const ProductoDetalle: React.FC = () => {
     return <div className="producto-detalle"><p>Producto no encontrado.</p></div>;
   }
 
+  const descargarFichaTecnica = () => {
+  const link = document.createElement('a');
+  link.href = `http://127.0.0.1:8000/media/productos/pdfs/Soleras.pdf`;
+  link.download = 'ficha_tecnica.pdf'; // Puedes poner un nombre más descriptivo
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
   return (
     <div className="producto-detalle">
       <h2>{product.nombreProducto}</h2>
@@ -158,7 +168,7 @@ const ProductoDetalle: React.FC = () => {
         <p><strong>Stock disponible:</strong> {product.stock} unidades</p>
         <p><strong>Categoría ID:</strong> {product.id_categoria}</p>
       </div>
-
+    
       <div className="acciones-producto">
         <button className="btn btn-outline-danger" onClick={agregarAlCarrito}>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-cart" viewBox="0 0 16 16">
@@ -166,7 +176,13 @@ const ProductoDetalle: React.FC = () => {
           </svg> Agregar al carrito
         </button>
         <button className="btn btn-outline-danger">Comprar</button>
-        <button className="btn btn-outline-danger">Descargar ficha técnica</button>
+        <a
+          href={`http://127.0.0.1:8000/producto/descargar-pdf/${product.archivo_pdf?.split('/').pop()}`}
+          className="btn btn-outline-danger"
+          download
+        >
+          Descargar ficha técnica
+        </a>
       </div>
     </div>
   );

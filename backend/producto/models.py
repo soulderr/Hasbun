@@ -9,6 +9,7 @@ class Producto(models.Model):
     id_carrito = models.ForeignKey('carrito.Carrito', on_delete=models.PROTECT, null=True, blank=True, db_column='id_carrito')
     nombreProducto = models.CharField(max_length=100)
     imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
+    archivo_pdf = models.FileField(upload_to='productos/pdfs/', null=True, blank=True)
     precioProducto = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     precioNeto = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.IntegerField()

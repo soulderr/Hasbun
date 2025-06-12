@@ -11,8 +11,8 @@ interface ApiProduct {
   precioNeto: string; // O number
   stock: number;
   descripcion: string;
-  peso: string; // O number
   id_categoria: number;
+  archivo_pdf?: string;
   // id_detalleVenta: number | null; // Descomenta si lo necesitas
   // id_carrito: number | null;    // Descomenta si lo necesitas
 }
