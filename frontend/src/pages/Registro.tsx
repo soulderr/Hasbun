@@ -42,8 +42,8 @@ function Registro() {
 
       setSuccess('Registro exitoso');
       // Guarda tokens en localStorage
-      localStorage.setItem('accessToken', response.data.access);
-      localStorage.setItem('refreshToken', response.data.refresh);
+      localStorage.setItem('access', response.data.access);
+      localStorage.setItem('refresh', response.data.refresh);
 
       console.log('Tokens guardados:', response.data);
       // Aquí puedes redirigir al usuario o mostrar mensaje de éxito

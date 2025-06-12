@@ -17,9 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from usuarios.views import RegisterView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView
 from django.conf import settings
 from django.conf.urls.static import static
+from usuarios.views import MyTokenObtainPairView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,7 +34,7 @@ urlpatterns = [
     path('metodoPago/', include('metodoPago.urls')),
     path('fichatecnica/', include('fichaTecnica.urls')),
     path('registro/', RegisterView.as_view()),
-    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 

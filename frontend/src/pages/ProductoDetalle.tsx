@@ -75,7 +75,7 @@ const ProductoDetalle: React.FC = () => {
   const agregarAlCarrito = async () => {
   if (!product) return;
 
-  const accessToken = localStorage.getItem('accessToken');
+  const access = localStorage.getItem('access');
   const carritoId = localStorage.getItem('carritoId');
 
   const item = {
@@ -86,13 +86,13 @@ const ProductoDetalle: React.FC = () => {
 
   console.log("🟨 Item a enviar:", item);
   
-  if (accessToken ) {
+  if (access ) {
     try {
       const response = await fetch('http://127.0.0.1:8000/carrito/items/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${access}`,
         },
         body: JSON.stringify(item),
       });

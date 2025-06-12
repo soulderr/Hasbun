@@ -23,7 +23,7 @@ const Carrito: React.FC = () => {
   const { items, total, loading } = useAppSelector((state: RootState) => state.carrito);
   console.log('🛒 Items autenticado:', items);
   const [carritoInvitado, setCarritoInvitado] = useState<ProductoInvitado[]>([]);
-  const isAuthenticated = Boolean(localStorage.getItem('accessToken'));
+  const isAuthenticated = Boolean(localStorage.getItem('access'));
 
   useEffect(() => {
     const cargarCarrito = () => {

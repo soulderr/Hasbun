@@ -1,14 +1,15 @@
-import axios, { AxiosRequestConfig, AxiosError } from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig, AxiosRequestConfig } from 'axios';
 
 const api = axios.create({
   baseURL: 'http://127.0.0.1:8000/',
 });
 
 // Interceptor de solicitud para agregar token
-api.interceptors.request.use((config: AxiosRequestConfig) => {
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (config.url && !config.url.includes('usuarios/recuperar')) {
-    const token = localStorage.getItem('accessToken');
-    if (token && config.headers) {
+    const token = localStorage.getItem('access');
+    if (token) {
+      config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
     }
   }
@@ -35,7 +36,7 @@ api.interceptors.response.use(
         });
 
         const newAccess = response.data.access;
-        localStorage.setItem('accessToken', newAccess);
+        localStorage.setItem('access', newAccess);
 
         // Actualizar header y reintentar
         originalRequest.headers = {
@@ -46,8 +47,8 @@ api.interceptors.response.use(
         return axios(originalRequest); // Reintento de la solicitud original
       } catch (refreshError) {
         // Si falla el refresh, forzar logout
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
         window.location.href = '/login'; // Redirige al login
       }
     }

@@ -21,9 +21,8 @@ function Login() {
       });
 
       const { access, refresh } = response.data;
-      localStorage.setItem('accessToken', access);
-      localStorage.setItem('refreshToken', refresh);
-
+      localStorage.setItem('access', access);
+      localStorage.setItem('refresh', refresh);
       // 🛒 Buscar carrito existente o crear uno nuevo
       try {
         const carritoResponse = await api.get('http://127.0.0.1:8000/carrito/', {

@@ -1,12 +1,17 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+
+
 class Usuario(AbstractUser):
     email = models.EmailField(unique=True)
-    rol = models.IntegerField(default=0)  # 0: usuario, 1: administrador
+    rol = models.IntegerField(default=0)
 
-    USERNAME_FIELD = 'email'  # Usar el campo email como identificador para login
-    REQUIRED_FIELDS = ['username']  # Campos requeridos al crear superusuarios
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return self.email
+
+        
+

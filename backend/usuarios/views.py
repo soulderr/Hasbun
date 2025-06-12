@@ -14,8 +14,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
 from django.conf import settings
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework import permissions
+from .serializers import MyTokenObtainPairSerializer
 
 User = get_user_model()
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
 
 class RegisterView(APIView):
     def post(self, request):
@@ -26,12 +32,24 @@ class RegisterView(APIView):
             if User.objects.filter(username=username).exists():
                 return Response({"error": "El usuario ya existe"}, status=status.HTTP_400_BAD_REQUEST)
 
-            user = User.objects.create(username=username, email=username, password=password)
+            # ✅ Crear usuario con rol 0 (usuario normal)
+            user = User.objects.create(
+                username=username,
+                email=username,
+                password=password,
+                rol=0  # ⚠️ Forzamos que sea usuario normal
+            )
+
             refresh = RefreshToken.for_user(user)
+
+            # Añadir 'rol' al token access manualmente
+            access_token = refresh.access_token
+            access_token['rol'] = user.rol
 
             return Response({
                 'refresh': str(refresh),
-                'access': str(refresh.access_token),
+                'access': str(access_token),
+                'rol': user.rol,
             })
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -69,15 +87,39 @@ class RecuperacionPasswordView(APIView):
             uid = urlsafe_base64_decode(uidb64).decode()
             user = User.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            return Response({'detail': 'Enlace inválido o usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Usuario inválido'}, status=status.HTTP_400_BAD_REQUEST)
 
         if not default_token_generator.check_token(user, token):
-            return Response({'detail': 'Token inválido o expirado.'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({'error': 'Token inválido o expirado'}, status=status.HTTP_400_BAD_REQUEST)
 
-        password = request.data.get("password")
-        if not password or len(password) < 6:
-            return Response({'password': ['Debe tener al menos 6 caracteres.']}, status=status.HTTP_400_BAD_REQUEST)
+        nueva_contrasena = request.data.get('password')
+        if not nueva_contrasena:
+            return Response({'error': 'Debe proporcionar una nueva contraseña'}, status=status.HTTP_400_BAD_REQUEST)
 
-        user.set_password(password)
+        user.set_password(nueva_contrasena)
         user.save()
-        return Response({'message': 'Contraseña actualizada correctamente'})
+
+        return Response({'mensaje': 'Contraseña restablecida con éxito ✅'}, status=status.HTTP_200_OK)
+
+class CrearAdministradorView(APIView):
+    permission_classes = [permissions.IsAdminUser]  # Solo superusuarios o personal staff
+
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        if not email or not password:
+            return Response({'error': 'Email y contraseña son requeridos.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if User.objects.filter(email=email).exists():
+            return Response({'error': 'Ya existe un usuario con ese email.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.create(
+            email=email,
+            username=email,
+            password=make_password(password),
+            rol=1,
+            is_staff=True  # Opcional, si deseas acceso al panel admin
+        )
+
+        return Response({'mensaje': 'Administrador creado exitosamente ✅'}, status=status.HTTP_201_CREATED)
