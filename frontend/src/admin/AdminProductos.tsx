@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Button, Form, Pagination, Modal, Row, Col } from 'react-bootstrap';
+import { Table, Button, Form, Pagination, Modal, Row, Col, ButtonGroup } from 'react-bootstrap';
 import './AdminProductos.css';
 
 interface Producto {
@@ -120,7 +120,7 @@ const AdminProductos: React.FC = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>ID</th>
+              <th style={{ width: '10%' }}>ID</th>
               <th>Nombre</th>
               <th>Precio</th>
               <th>Stock</th>
@@ -139,27 +139,28 @@ const AdminProductos: React.FC = () => {
                 <td>{producto.descripcion}</td>
                 <td>{typeof producto.id_categoria === 'object' ? producto.id_categoria.nombreCategoria : producto.id_categoria}</td>
                 <td>
-                  <Button
-                    variant="warning"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => {
-                      setProductoAEditar(producto);
-                      setMostrarModalEditar(true);
-                    }}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => {
-                      setProductoAEliminar(producto);
-                      setMostrarModalEliminar(true);
-                    }}
-                  >
-                    Eliminar
-                  </Button>
+                  <ButtonGroup>
+                    <Button
+                      variant="warning"
+                      size="sm"
+                      onClick={() => {
+                        setProductoAEditar(producto);
+                        setMostrarModalEditar(true);
+                      }}
+                    >
+                      ✎
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => {
+                        setProductoAEliminar(producto);
+                        setMostrarModalEliminar(true);
+                      }}
+                    >
+                      🗑
+                    </Button>
+                  </ButtonGroup>
                 </td>
               </tr>
             ))}
