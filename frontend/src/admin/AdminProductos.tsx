@@ -28,6 +28,9 @@ const AdminProductos: React.FC = () => {
   const [mostrarModalEliminar, setMostrarModalEliminar] = useState(false);
   const [productoAEliminar, setProductoAEliminar] = useState<Producto | null>(null);
 
+  const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
+  const [productoAEditar, setProductoAEditar] = useState<Producto | null>(null);
+
   useEffect(() => {
     axios.get('http://localhost:8000/producto/')
       .then((res) => setProductos(res.data))
@@ -35,18 +38,36 @@ const AdminProductos: React.FC = () => {
 
     axios.get('http://localhost:8000/categoria/')
       .then((res) => {
-        const categoriasFiltradas = res.data.filter((cat: Categoria) => cat.idCategoriaPadre); // Solo subcategorías
+        const categoriasFiltradas = res.data.filter((cat: Categoria) => cat.idCategoriaPadre);
         setCategorias(categoriasFiltradas);
       })
       .catch((err) => console.error('Error al obtener categorías:', err));
   }, []);
 
   const eliminarProducto = (id: string) => {
-    axios.delete(`http://localhost:8000/producto/${id}/`)
+    axios.delete(`http://localhost:8000/producto/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access')}`,
+      },
+    })
       .then(() => {
         setProductos(prev => prev.filter(p => p.idProducto !== id));
       })
       .catch(err => console.error('Error al eliminar:', err));
+  };
+
+  const editarProducto = () => {
+    if (!productoAEditar) return;
+    axios.put(`http://localhost:8000/producto/${productoAEditar.idProducto}/`, productoAEditar, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access')}`,
+      },
+    })
+      .then(res => {
+        setProductos(prev => prev.map(p => p.idProducto === productoAEditar.idProducto ? res.data : p));
+        setMostrarModalEditar(false);
+      })
+      .catch(err => console.error('Error al editar:', err));
   };
 
   const productosFiltrados = productos.filter(producto => {
@@ -118,7 +139,15 @@ const AdminProductos: React.FC = () => {
                 <td>{producto.descripcion}</td>
                 <td>{typeof producto.id_categoria === 'object' ? producto.id_categoria.nombreCategoria : producto.id_categoria}</td>
                 <td>
-                  <Button variant="warning" size="sm" className="me-2">
+                  <Button
+                    variant="warning"
+                    size="sm"
+                    className="me-2"
+                    onClick={() => {
+                      setProductoAEditar(producto);
+                      setMostrarModalEditar(true);
+                    }}
+                  >
                     Editar
                   </Button>
                   <Button
@@ -173,6 +202,56 @@ const AdminProductos: React.FC = () => {
             }}
           >
             Eliminar
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={mostrarModalEditar} onHide={() => setMostrarModalEditar(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Editar Producto</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Nombre</Form.Label>
+              <Form.Control
+                type="text"
+                value={productoAEditar?.nombreProducto || ''}
+                onChange={(e) => setProductoAEditar(p => p ? { ...p, nombreProducto: e.target.value } : null)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Precio Neto</Form.Label>
+              <Form.Control
+                type="number"
+                value={productoAEditar?.precioNeto || ''}
+                onChange={(e) => setProductoAEditar(p => p ? { ...p, precioNeto: parseFloat(e.target.value) } : null)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Stock</Form.Label>
+              <Form.Control
+                type="number"
+                value={productoAEditar?.stock || ''}
+                onChange={(e) => setProductoAEditar(p => p ? { ...p, stock: parseInt(e.target.value) } : null)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Descripción</Form.Label>
+              <Form.Control
+                type="text"
+                value={productoAEditar?.descripcion || ''}
+                onChange={(e) => setProductoAEditar(p => p ? { ...p, descripcion: e.target.value } : null)}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setMostrarModalEditar(false)}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={editarProducto}>
+            Guardar cambios
           </Button>
         </Modal.Footer>
       </Modal>
