@@ -34,6 +34,7 @@ const AdminProductos: React.FC = () => {
   const [mostrarModalAgregar, setMostrarModalAgregar] = useState(false);
   const [nuevoProducto, setNuevoProducto] = useState<Partial<Producto>>({});
   const [errorFormulario, setErrorFormulario] = useState<string | null>(null);
+  const [mensajeExito, setMensajeExito] = useState<string | null>(null);
 
   useEffect(() => {
     axios.get('http://localhost:8000/producto/')
@@ -106,6 +107,8 @@ const AdminProductos: React.FC = () => {
         setProductos(prev => [...prev, res.data]);
         setMostrarModalAgregar(false);
         setNuevoProducto({});
+        setMensajeExito("Producto agregado exitosamente ✅");
+        setTimeout(() => setMensajeExito(null), 3000);
       })
       .catch(err => {
         console.error('Error al agregar:', err);
@@ -137,6 +140,14 @@ const AdminProductos: React.FC = () => {
     <div className="container mt-5">
       <h2>Panel de Administración - Productos</h2>
 
+      {mensajeExito && (
+        <div className="d-flex justify-content-center my-3">
+          <Alert variant="success" className="text-center">
+            {mensajeExito}
+          </Alert>
+        </div>
+      )}
+
       <Row className="mb-3">
         <Col md={6}>
           <Form.Group>
@@ -164,6 +175,7 @@ const AdminProductos: React.FC = () => {
           </Button>
         </Col>
       </Row>
+
       <Modal show={mostrarModalAgregar} onHide={() => setMostrarModalAgregar(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Agregar nuevo producto</Modal.Title>
@@ -235,7 +247,7 @@ const AdminProductos: React.FC = () => {
             Guardar producto
           </Button>
         </Modal.Footer>
-      </Modal>        
+      </Modal>       
 
       <Table striped bordered hover responsive>
         <thead>
