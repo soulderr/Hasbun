@@ -54,7 +54,7 @@ function Login() {
       }
 
       // ✅ Redirigir al dashboard
-      navigate('/dashboard');
+      navigate('/home');
     } catch (error) {
       console.error('❌ Error en login:', error);
       alert('Credenciales incorrectas');
