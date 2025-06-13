@@ -107,7 +107,10 @@ const AdminProductos: React.FC = () => {
         setMostrarModalAgregar(false);
         setNuevoProducto({});
       })
-      .catch(err => console.error('Error al agregar:', err));
+      .catch(err => {
+        console.error('Error al agregar:', err);
+        setErrorFormulario("Error al agregar producto. Asegúrate de tener permiso y estar autenticado ❌");
+      });
   };
 
   const productosFiltrados = productos.filter(producto => {
@@ -161,7 +164,78 @@ const AdminProductos: React.FC = () => {
           </Button>
         </Col>
       </Row>
-
+      <Modal show={mostrarModalAgregar} onHide={() => setMostrarModalAgregar(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Agregar nuevo producto</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {errorFormulario && <Alert variant="danger">{errorFormulario}</Alert>}
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>ID Producto</Form.Label>
+              <Form.Control
+                type="text"
+                value={nuevoProducto.idProducto || ''}
+                onChange={(e) => setNuevoProducto({ ...nuevoProducto, idProducto: e.target.value })}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Nombre</Form.Label>
+              <Form.Control
+                type="text"
+                value={nuevoProducto.nombreProducto || ''}
+                onChange={(e) => setNuevoProducto({ ...nuevoProducto, nombreProducto: e.target.value })}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Precio Neto</Form.Label>
+              <Form.Control
+                type="number"
+                value={nuevoProducto.precioNeto || ''}
+                onChange={(e) => setNuevoProducto({ ...nuevoProducto, precioNeto: parseFloat(e.target.value) })}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Stock</Form.Label>
+              <Form.Control
+                type="number"
+                value={nuevoProducto.stock || ''}
+                onChange={(e) => setNuevoProducto({ ...nuevoProducto, stock: parseInt(e.target.value) })}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Descripción</Form.Label>
+              <Form.Control
+                type="text"
+                value={nuevoProducto.descripcion || ''}
+                onChange={(e) => setNuevoProducto({ ...nuevoProducto, descripcion: e.target.value })}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Categoría</Form.Label>
+              <Form.Select
+                value={nuevoProducto.id_categoria || ''}
+                onChange={(e) => setNuevoProducto({ ...nuevoProducto, id_categoria: e.target.value })}
+              >
+                <option value="">-- Selecciona una categoría --</option>
+                {categorias.map((cat) => (
+                  <option key={cat.id_categoria} value={cat.id_categoria}>
+                    {cat.nombreCategoria}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setMostrarModalAgregar(false)}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={agregarProducto}>
+            Guardar producto
+          </Button>
+        </Modal.Footer>
+      </Modal>        
 
       <Table striped bordered hover responsive>
         <thead>
