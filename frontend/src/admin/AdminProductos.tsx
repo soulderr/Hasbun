@@ -42,8 +42,8 @@ const AdminProductos: React.FC = () => {
 
     axios.get('http://localhost:8000/categoria/')
       .then((res) => {
-        const categoriasFiltradas = res.data.filter((cat: Categoria) => cat.idCategoriaPadre);
-        setCategorias(categoriasFiltradas);
+        const subcategorias = res.data.filter((cat: Categoria) => cat.idCategoriaPadre !== null);
+        setCategorias(subcategorias);
       })
       .catch((err) => console.error('Error al obtener categorías:', err));
   }, []);
@@ -76,13 +76,16 @@ const AdminProductos: React.FC = () => {
 
   const agregarProducto = () => {
     if (
+      !nuevoProducto.idProducto ||
       !nuevoProducto.nombreProducto ||
       !nuevoProducto.precioNeto || nuevoProducto.precioNeto <= 0 ||
       nuevoProducto.stock === undefined || nuevoProducto.stock < 1 ||
       !nuevoProducto.descripcion ||
       !nuevoProducto.id_categoria
     ) {
-      if (nuevoProducto.stock !== undefined && nuevoProducto.stock < 1) {
+      if (!nuevoProducto.idProducto) {
+        setErrorFormulario("El ID del producto es obligatorio.");
+      } else if (nuevoProducto.stock !== undefined && nuevoProducto.stock < 1) {
         setErrorFormulario("El stock debe ser al menos 1.");
       } else if (nuevoProducto.precioNeto !== undefined && nuevoProducto.precioNeto <= 0) {
         setErrorFormulario("El precio debe ser mayor a 0.");
@@ -128,13 +131,13 @@ const AdminProductos: React.FC = () => {
   };
 
   return (
-    <div className="container admin-productos-container">
-      <h2 className="mb-4">Panel de Administración - Productos</h2>
+    <div className="container mt-5">
+      <h2>Panel de Administración - Productos</h2>
 
-      <Row className="mb-4">
-        <Col md={6} className="categoria-filtro">
+      <Row className="mb-3">
+        <Col md={6}>
           <Form.Group>
-            <Form.Label><strong>Filtrar por Categoría</strong></Form.Label>
+            <Form.Label>Filtrar por Categoría</Form.Label>
             <Form.Select
               value={categoriaSeleccionada}
               onChange={(e) => {
@@ -151,66 +154,65 @@ const AdminProductos: React.FC = () => {
             </Form.Select>
           </Form.Group>
         </Col>
-        <Col md={6} className="text-end align-self-end">
+
+        <Col md={6} className="d-flex align-items-end justify-content-end">
           <Button variant="success" onClick={() => setMostrarModalAgregar(true)}>
-            + Agregar Producto
+            Agregar producto
           </Button>
         </Col>
       </Row>
 
-      <div className="table-responsive">
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th style={{ width: '10%' }}>ID</th>
-              <th>Nombre</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Descripción</th>
-              <th>Categoría</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {productosPagina.map((producto) => (
-              <tr key={producto.idProducto}>
-                <td>{producto.idProducto}</td>
-                <td>{producto.nombreProducto}</td>
-                <td>${producto.precioNeto}</td>
-                <td>{producto.stock}</td>
-                <td>{producto.descripcion}</td>
-                <td>{typeof producto.id_categoria === 'object' ? producto.id_categoria.nombreCategoria : producto.id_categoria}</td>
-                <td>
-                  <ButtonGroup>
-                    <Button
-                      variant="warning"
-                      size="sm"
-                      onClick={() => {
-                        setProductoAEditar(producto);
-                        setMostrarModalEditar(true);
-                      }}
-                    >
-                      ✎
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => {
-                        setProductoAEliminar(producto);
-                        setMostrarModalEliminar(true);
-                      }}
-                    >
-                      🗑
-                    </Button>
-                  </ButtonGroup>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      </div>
 
-      <Pagination className="justify-content-center mt-4">
+      <Table striped bordered hover responsive>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Descripción</th>
+            <th>Categoría</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {productosPagina.map((producto) => (
+            <tr key={producto.idProducto}>
+              <td>{producto.idProducto}</td>
+              <td>{producto.nombreProducto}</td>
+              <td>${producto.precioNeto}</td>
+              <td>{producto.stock}</td>
+              <td>{producto.descripcion}</td>
+              <td>{typeof producto.id_categoria === 'object' ? producto.id_categoria.nombreCategoria : producto.id_categoria}</td>
+              <td>
+                <Button
+                  variant="warning"
+                  size="sm"
+                  className="me-2"
+                  onClick={() => {
+                    setProductoAEditar(producto);
+                    setMostrarModalEditar(true);
+                  }}
+                >
+                  Editar
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => {
+                    setProductoAEliminar(producto);
+                    setMostrarModalEliminar(true);
+                  }}
+                >
+                  Eliminar
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+
+      <Pagination className="justify-content-center">
         <Pagination.Prev onClick={() => cambiarPagina(paginaActual - 1)} disabled={paginaActual === 1} />
         {[...Array(totalPaginas)].map((_, index) => (
           <Pagination.Item
@@ -224,6 +226,7 @@ const AdminProductos: React.FC = () => {
         <Pagination.Next onClick={() => cambiarPagina(paginaActual + 1)} disabled={paginaActual === totalPaginas} />
       </Pagination>
 
+      {/* Modal Eliminar */}
       <Modal show={mostrarModalEliminar} onHide={() => setMostrarModalEliminar(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmar eliminación</Modal.Title>
@@ -249,67 +252,70 @@ const AdminProductos: React.FC = () => {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={mostrarModalAgregar} onHide={() => setMostrarModalAgregar(false)}>
+      {/* Modal Editar */}
+      <Modal show={mostrarModalEditar} onHide={() => setMostrarModalEditar(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Agregar Producto</Modal.Title>
+          <Modal.Title>Editar Producto</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            {errorFormulario && <Alert variant="danger">{errorFormulario}</Alert>}
-            <Form.Group className="mb-3">
-              <Form.Label>Nombre</Form.Label>
-              <Form.Control
-                type="text"
-                value={nuevoProducto.nombreProducto || ''}
-                onChange={(e) => setNuevoProducto({ ...nuevoProducto, nombreProducto: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Precio Neto</Form.Label>
-              <Form.Control
-                type="number"
-                value={nuevoProducto.precioNeto || ''}
-                onChange={(e) => setNuevoProducto({ ...nuevoProducto, precioNeto: parseFloat(e.target.value) })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Stock</Form.Label>
-              <Form.Control
-                type="number"
-                value={nuevoProducto.stock || ''}
-                onChange={(e) => setNuevoProducto({ ...nuevoProducto, stock: parseInt(e.target.value) })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Descripción</Form.Label>
-              <Form.Control
-                type="text"
-                value={nuevoProducto.descripcion || ''}
-                onChange={(e) => setNuevoProducto({ ...nuevoProducto, descripcion: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Categoría</Form.Label>
-              <Form.Select
-                value={nuevoProducto.id_categoria || ''}
-                onChange={(e) => setNuevoProducto({ ...nuevoProducto, id_categoria: e.target.value })}
-              >
-                <option value="">Selecciona una categoría</option>
-                {categorias.map((cat) => (
-                  <option key={cat.id_categoria} value={cat.id_categoria}>
-                    {cat.nombreCategoria}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Form>
+          {productoAEditar && (
+            <Form>
+              <Form.Group className="mb-2">
+                <Form.Label>Nombre</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={productoAEditar.nombreProducto}
+                  onChange={(e) => setProductoAEditar({ ...productoAEditar, nombreProducto: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Precio Neto</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={productoAEditar.precioNeto}
+                  onChange={(e) => setProductoAEditar({ ...productoAEditar, precioNeto: parseFloat(e.target.value) })}
+                />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Stock</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={productoAEditar.stock}
+                  onChange={(e) => setProductoAEditar({ ...productoAEditar, stock: parseInt(e.target.value) })}
+                />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Descripción</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={2}
+                  value={productoAEditar.descripcion}
+                  onChange={(e) => setProductoAEditar({ ...productoAEditar, descripcion: e.target.value })}
+                />
+              </Form.Group>
+              <Form.Group className="mb-2">
+                <Form.Label>Categoría</Form.Label>
+                <Form.Select
+                  value={productoAEditar.id_categoria?.id_categoria || productoAEditar.id_categoria}
+                  onChange={(e) => setProductoAEditar({ ...productoAEditar, id_categoria: e.target.value })}
+                >
+                  <option value="">-- Seleccionar categoría --</option>
+                  {categorias.map((cat) => (
+                    <option key={cat.id_categoria} value={cat.id_categoria}>
+                      {cat.nombreCategoria}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Form>
+          )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setMostrarModalAgregar(false)}>
+          <Button variant="secondary" onClick={() => setMostrarModalEditar(false)}>
             Cancelar
           </Button>
-          <Button variant="success" onClick={agregarProducto}>
-            Agregar
+          <Button variant="primary" onClick={editarProducto}>
+            Guardar Cambios
           </Button>
         </Modal.Footer>
       </Modal>
