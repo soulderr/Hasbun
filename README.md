@@ -46,7 +46,7 @@ Es una aplicación web hecha con React, Django y MySQL.
 -Git
 -Gmail
 -DjangoREstFramework
-
+-Bootstrap
 
 ## Comando para activar el entorno virtual
     .\.venv\Scripts\activate
