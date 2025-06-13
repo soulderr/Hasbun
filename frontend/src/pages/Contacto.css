@@ -1,41 +1,91 @@
-.contacto-container {
+/* Contacto.css actualizado para diseño moderno y responsivo */
+
+.contacto-wrapper {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  max-height: 60vh; /* Limita la altura máxima de la clase */
+  overflow-y: auto; /* Permite el desplazamiento vertical */
+  width: 55%;
+  box-sizing: border-box;
+}
+
+.titulo {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #df0404;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.formulario-contacto {
+  width: 100%;
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.input-dark {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+}
+
+.input-dark:focus {
+  background-color: #fff;
+  border-color: #df0404;
+  box-shadow: 0 0 0 0.2rem rgba(223, 4, 4, 0.25);
+  outline: none;
+}
+
+button.btn-danger {
+  padding: 10px 30px;
+  font-weight: bold;
+  font-size: 1.1em;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+button.btn-danger:hover {
+  background-color: #b50303;
+}
+
+@media (max-width: 576px) {
+  .formulario-contacto {
+    padding: 20px;
+  }
+
+  .titulo {
+    font-size: 2em;
+  }
+}
+
+ .formulario-contacto label {
+    display: block;
+    text-align: left;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .formulario-contacto .form-group {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    box-sizing: border-box;
-    height: 100vh;
+    align-items: flex-start;
+    margin-bottom: 18px;
   }
-  
-  .contacto-card {
-    width: 100%;
-    max-width: 600px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    box-sizing: border-box;
-  }
-  
-  .titulo {
-    margin-bottom: 20px;
-    font-size: 2em;
-    text-align: center;
-    text-decoration: underline;
-  }
-  
-  /* Estilos para los campos de entrada de Contacto */
-  .input-dark {
-    background-color: #f0f0f0; /* Color de fondo más oscuro */
-    border: 1px solid #ccc; /* Borde gris */
-    padding: 10px;
-    border-radius: 4px;
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 10px;
-  }
-  
+
   .input-dark:focus {
-    background-color: #ffffff; /* Color de fondo más oscuro al enfocar */
-    border-color: #df0404; /* Borde más oscuro al enfocar */
-    outline: none; /* Eliminar el borde de enfoque predeterminado */
-  }
+  border-color: #0d6efd !important; /* Azul Bootstrap */
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* Sombra azul clara */
+  outline: none;
+}
+
+.input-dark:focus:invalid {
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}

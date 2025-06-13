@@ -25,7 +25,6 @@ from usuarios.views import MyTokenObtainPairView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('usuarios/', include('usuarios.urls')),
-    path('cotizacion/', include('cotizacion.urls')),
     path('carrito/', include('carrito.urls')),
     path('producto/', include('producto.urls')),
     path('categoria/', include('categoria.urls')),
@@ -36,6 +35,7 @@ urlpatterns = [
     path('registro/', RegisterView.as_view()),
     path('login/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('contacto/', include('contacto.urls')),
 ]
 
 if settings.DEBUG:

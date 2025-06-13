@@ -220,7 +220,7 @@ const Header: React.FC = () => {
                   <Link to="/admin/productos" className="nav-link" onClick={closeMenu}>Panel Admin</Link>
                 </li>
                 <li className="nav-item">
-                  <Link to="/contacto" className="nav-link" onClick={closeMenu}>Contacto</Link>
+                  <Link to="/admin/contacto" className="nav-link" onClick={closeMenu}>Contacto</Link>
                 </li>
                 <li className="nav-item">
                   <Link to="/visitanos" className="nav-link" onClick={closeMenu}>Visítanos</Link>

@@ -1,0 +1,54 @@
+.admin-contacto {
+  padding: 20px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.admin-contacto h2 {
+  font-weight: bold;
+  font-size: 1.8rem;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  min-width: 800px; /* asegura buena visualización en pantallas amplias */
+  font-size: 0.95rem;
+}
+
+.table th {
+  background-color: #f8f9fa !important;
+  color: #212529 !important;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table td {
+  vertical-align: middle;
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .admin-contacto {
+    padding: 10px;
+  }
+
+  .table th, .table td {
+    font-size: 0.85rem;
+    padding: 6px;
+  }
+
+  .table {
+    min-width: 100%;
+  }
+}
+
+.pagination {
+  margin-top: 20px;
+}
