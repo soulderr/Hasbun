@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Button, Form, Pagination, Modal, Row, Col, ButtonGroup } from 'react-bootstrap';
+import { Table, Button, Form, Pagination, Modal, Row, Col, ButtonGroup, Alert } from 'react-bootstrap';
 import './AdminProductos.css';
 
 interface Producto {
@@ -30,6 +30,10 @@ const AdminProductos: React.FC = () => {
 
   const [mostrarModalEditar, setMostrarModalEditar] = useState(false);
   const [productoAEditar, setProductoAEditar] = useState<Producto | null>(null);
+
+  const [mostrarModalAgregar, setMostrarModalAgregar] = useState(false);
+  const [nuevoProducto, setNuevoProducto] = useState<Partial<Producto>>({});
+  const [errorFormulario, setErrorFormulario] = useState<string | null>(null);
 
   useEffect(() => {
     axios.get('http://localhost:8000/producto/')
@@ -68,6 +72,39 @@ const AdminProductos: React.FC = () => {
         setMostrarModalEditar(false);
       })
       .catch(err => console.error('Error al editar:', err));
+  };
+
+  const agregarProducto = () => {
+    if (
+      !nuevoProducto.nombreProducto ||
+      !nuevoProducto.precioNeto || nuevoProducto.precioNeto <= 0 ||
+      nuevoProducto.stock === undefined || nuevoProducto.stock < 1 ||
+      !nuevoProducto.descripcion ||
+      !nuevoProducto.id_categoria
+    ) {
+      if (nuevoProducto.stock !== undefined && nuevoProducto.stock < 1) {
+        setErrorFormulario("El stock debe ser al menos 1.");
+      } else if (nuevoProducto.precioNeto !== undefined && nuevoProducto.precioNeto <= 0) {
+        setErrorFormulario("El precio debe ser mayor a 0.");
+      } else {
+        setErrorFormulario("Todos los campos son obligatorios.");
+      }
+      return;
+    }
+
+    setErrorFormulario(null);
+
+    axios.post('http://localhost:8000/producto/', nuevoProducto, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access')}`,
+      },
+    })
+      .then(res => {
+        setProductos(prev => [...prev, res.data]);
+        setMostrarModalAgregar(false);
+        setNuevoProducto({});
+      })
+      .catch(err => console.error('Error al agregar:', err));
   };
 
   const productosFiltrados = productos.filter(producto => {
@@ -113,6 +150,11 @@ const AdminProductos: React.FC = () => {
               ))}
             </Form.Select>
           </Form.Group>
+        </Col>
+        <Col md={6} className="text-end align-self-end">
+          <Button variant="success" onClick={() => setMostrarModalAgregar(true)}>
+            + Agregar Producto
+          </Button>
         </Col>
       </Row>
 
@@ -207,52 +249,67 @@ const AdminProductos: React.FC = () => {
         </Modal.Footer>
       </Modal>
 
-      <Modal show={mostrarModalEditar} onHide={() => setMostrarModalEditar(false)}>
+      <Modal show={mostrarModalAgregar} onHide={() => setMostrarModalAgregar(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Editar Producto</Modal.Title>
+          <Modal.Title>Agregar Producto</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
+            {errorFormulario && <Alert variant="danger">{errorFormulario}</Alert>}
             <Form.Group className="mb-3">
               <Form.Label>Nombre</Form.Label>
               <Form.Control
                 type="text"
-                value={productoAEditar?.nombreProducto || ''}
-                onChange={(e) => setProductoAEditar(p => p ? { ...p, nombreProducto: e.target.value } : null)}
+                value={nuevoProducto.nombreProducto || ''}
+                onChange={(e) => setNuevoProducto({ ...nuevoProducto, nombreProducto: e.target.value })}
               />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Precio Neto</Form.Label>
               <Form.Control
                 type="number"
-                value={productoAEditar?.precioNeto || ''}
-                onChange={(e) => setProductoAEditar(p => p ? { ...p, precioNeto: parseFloat(e.target.value) } : null)}
+                value={nuevoProducto.precioNeto || ''}
+                onChange={(e) => setNuevoProducto({ ...nuevoProducto, precioNeto: parseFloat(e.target.value) })}
               />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Stock</Form.Label>
               <Form.Control
                 type="number"
-                value={productoAEditar?.stock || ''}
-                onChange={(e) => setProductoAEditar(p => p ? { ...p, stock: parseInt(e.target.value) } : null)}
+                value={nuevoProducto.stock || ''}
+                onChange={(e) => setNuevoProducto({ ...nuevoProducto, stock: parseInt(e.target.value) })}
               />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Descripción</Form.Label>
               <Form.Control
                 type="text"
-                value={productoAEditar?.descripcion || ''}
-                onChange={(e) => setProductoAEditar(p => p ? { ...p, descripcion: e.target.value } : null)}
+                value={nuevoProducto.descripcion || ''}
+                onChange={(e) => setNuevoProducto({ ...nuevoProducto, descripcion: e.target.value })}
               />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Categoría</Form.Label>
+              <Form.Select
+                value={nuevoProducto.id_categoria || ''}
+                onChange={(e) => setNuevoProducto({ ...nuevoProducto, id_categoria: e.target.value })}
+              >
+                <option value="">Selecciona una categoría</option>
+                {categorias.map((cat) => (
+                  <option key={cat.id_categoria} value={cat.id_categoria}>
+                    {cat.nombreCategoria}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setMostrarModalEditar(false)}>
+          <Button variant="secondary" onClick={() => setMostrarModalAgregar(false)}>
             Cancelar
           </Button>
-          <Button variant="primary" onClick={editarProducto}>
-            Guardar cambios
+          <Button variant="success" onClick={agregarProducto}>
+            Agregar
           </Button>
         </Modal.Footer>
       </Modal>
