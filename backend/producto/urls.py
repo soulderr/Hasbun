@@ -1,10 +1,10 @@
 from django.urls import path, include
-from rest_framework import routers
+from rest_framework.routers import DefaultRouter
 from producto import views
 from .views import descargar_pdf
 
-router = routers.DefaultRouter()
-router.register(r'', views.ProductoView, basename='producto')
+router = DefaultRouter()
+router.register(r'', views.ProductoViewSet, basename='producto')
 
 urlpatterns = [
     path('', include(router.urls)),

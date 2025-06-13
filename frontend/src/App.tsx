@@ -11,7 +11,6 @@ import Inventario from './pages/Inventario';
 import Contacto from './pages/Contacto';
 import ProductoDetalle from './pages/ProductoDetalle'; // Importa el componente de detalles del producto
 import './App.css';
-import Dashboard from './pages/Dashboard';
 import PrivateRoute from './pages/PrivateRoute';
 import CategoriaProducto from './pages/CategoriaProducto';
 import ResetPassword from './pages/ResetPassword';
@@ -19,6 +18,8 @@ import OlvidePassword from './pages/OlvidePassword';
 import Carrito from './components/Carrito';
 import Visitanos from './pages/Visitanos';
 import { FaWhatsapp } from 'react-icons/fa';
+import Dashboard from './pages/Dashboard';
+import AdminProductos from './admin/AdminProductos';
 
 function App() {
   return (
@@ -36,11 +37,14 @@ function App() {
             <Route path="/registro" element={<Registro />} />
             <Route path="/inventario" element={<Inventario />} />
             <Route path="/contacto" element={<Contacto />} />
-            <Route path="/dashboard" element={ <Dashboard />} />
             <Route path="/restablecer-password/:uid/:token/" element={<ResetPassword />} />
             <Route path="/recuperar" element={<OlvidePassword />} />
             <Route path="/carrito/items" element={<Carrito />} />
             <Route path="/visitanos" element={<Visitanos />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin/productos" element={<AdminProductos />} />
+
+         
             {/* Agrega más rutas según sea necesario */}
           </Routes>
         </main>

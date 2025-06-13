@@ -84,9 +84,6 @@ const Header: React.FC = () => {
                     <Link to="/categoria" className="nav-link" onClick={closeMenu}>Productos</Link>
                   </li>
                   <li className="nav-item">
-                    <Link to="/inventario" className="nav-link" onClick={closeMenu}>Inventario</Link>
-                  </li>
-                  <li className="nav-item">
                     <Link to="/contacto" className="nav-link" onClick={closeMenu}>Contacto</Link>
                   </li>
                   <li className="nav-item">
@@ -211,7 +208,7 @@ const Header: React.FC = () => {
             <div className={`collapse navbar-collapse ${menuOpen ? 'show' : ''}`}>
               <ul className="navbar-nav me-auto">
                 <li className="nav-item">
-                  <Link to="/inventario" className="nav-link" onClick={closeMenu}>Inventario</Link>
+                  <Link to="/admin/productos" className="nav-link" onClick={closeMenu}>Panel Admin</Link>
                 </li>
                 <li className="nav-item">
                   <Link to="/contacto" className="nav-link" onClick={closeMenu}>Contacto</Link>
