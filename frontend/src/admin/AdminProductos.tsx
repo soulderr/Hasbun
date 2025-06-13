@@ -23,7 +23,7 @@ const AdminProductos: React.FC = () => {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
   const [paginaActual, setPaginaActual] = useState(1);
-  const productosPorPagina = 10;
+  const productosPorPagina = 6;
 
   const [mostrarModalEliminar, setMostrarModalEliminar] = useState(false);
   const [productoAEliminar, setProductoAEliminar] = useState<Producto | null>(null);
