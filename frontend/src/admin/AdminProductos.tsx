@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, Button, Form, Pagination, Modal, Row, Col, ButtonGroup, Alert } from 'react-bootstrap';
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import './AdminProductos.css';
 
 interface Producto {
@@ -270,28 +271,27 @@ const AdminProductos: React.FC = () => {
               <td>{producto.stock}</td>
               <td>{producto.descripcion}</td>
               <td>{typeof producto.id_categoria === 'object' ? producto.id_categoria.nombreCategoria : producto.id_categoria}</td>
-              <td>
-                <Button
-                  variant="warning"
-                  size="sm"
-                  className="me-2"
+              <td className="text-center">
+                <button
+                  className="btn btn-link p-0 text-primary me-2"
                   onClick={() => {
                     setProductoAEditar(producto);
                     setMostrarModalEditar(true);
                   }}
+                  title="Editar"
                 >
-                  Editar
-                </Button>
-                <Button
-                  variant="danger"
-                  size="sm"
+                  <FaEdit size={18} />
+                </button>
+                <button
+                  className="btn btn-link p-0 text-danger"
                   onClick={() => {
                     setProductoAEliminar(producto);
                     setMostrarModalEliminar(true);
                   }}
+                  title="Eliminar"
                 >
-                  Eliminar
-                </Button>
+                  <FaTrashAlt size={18} />
+                </button>
               </td>
             </tr>
           ))}
