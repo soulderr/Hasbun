@@ -14,6 +14,7 @@ interface Producto {
 interface Categoria {
   id_categoria: string;
   nombreCategoria: string;
+  idCategoriaPadre?: string | null;
 }
 
 const AdminProductos: React.FC = () => {
@@ -32,7 +33,10 @@ const AdminProductos: React.FC = () => {
       .catch((err) => console.error('Error al obtener productos:', err));
 
     axios.get('http://localhost:8000/categoria/')
-      .then((res) => setCategorias(res.data))
+      .then((res) => {
+        const categoriasFiltradas = res.data.filter((cat: Categoria) => cat.idCategoriaPadre !== null);
+        setCategorias(categoriasFiltradas);
+      })
       .catch((err) => console.error('Error al obtener categorías:', err));
   }, []);
 
@@ -48,11 +52,11 @@ const AdminProductos: React.FC = () => {
     if (!categoriaSeleccionada) return true;
     if (!producto.id_categoria) return false;
     const categoriaId =
-        typeof producto.id_categoria === 'object'
+      typeof producto.id_categoria === 'object'
         ? producto.id_categoria.id_categoria
         : producto.id_categoria;
     return String(categoriaId) === categoriaSeleccionada;
-    });
+  });
 
   const totalPaginas = Math.ceil(productosFiltrados.length / productosPorPagina);
   const indiceInicio = (paginaActual - 1) * productosPorPagina;
