@@ -173,7 +173,7 @@ const Header: React.FC = () => {
                     </button>
                   </li>
                   <li className="nav-item">
-                    <button className="btn btn-outline-secondary ms-2" onClick={handleLogout}>
+                    <button type="button" className="btn btn-outline-danger" onClick={handleLogout}>
                       Cerrar Sesión
                     </button>
                   </li>
@@ -220,8 +220,8 @@ const Header: React.FC = () => {
                   <Link to="/visitanos" className="nav-link" onClick={closeMenu}>Visítanos</Link>
                 </li>
                 <li className="nav-item">
-                  <button className="btn btn-outline-secondary ms-2" onClick={handleLogout}>
-                    Cerrar Sesión
+                  <button type="button" className="btn btn-outline-danger" onClick={handleLogout}>
+                      Cerrar Sesión
                   </button>
                 </li>
                 <li className="nav-item d-none d-lg-block mx-auto">
