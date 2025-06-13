@@ -10,6 +10,7 @@ funcionalidades es la venta de productos, carrito de compra, administración de 
 registro, inicio de sesión, Visítanos y descarga de ficha técnica del producto. Consta de 3 roles que
 son invitado, usuario y administrador. Cada uno con diferentes permisos y vistas de las interfaces.
 Es una aplicación web hecha con React, Django y MySQL.
+ # IMPORTANTE: En la carpeta backend hay un readme que explica como cargar los datos a la BD  #
 # Requerimientos Funcionales
 -Gestión inicio de sesión
 -Recuperación de contraseña
