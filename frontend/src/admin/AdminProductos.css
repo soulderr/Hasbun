@@ -1,0 +1,9 @@
+.admin-productos-container {
+  margin-top: 60px;
+}
+
+.categoria-filtro select {
+  font-weight: bold;
+  padding: 8px;
+  font-size: 16px;
+}

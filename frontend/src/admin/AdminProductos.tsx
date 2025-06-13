@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Button, Form, Pagination, Modal } from 'react-bootstrap';
+import { Table, Button, Form, Pagination, Modal, Row, Col } from 'react-bootstrap';
+import './AdminProductos.css';
 
 interface Producto {
   idProducto: string;
@@ -34,7 +35,7 @@ const AdminProductos: React.FC = () => {
 
     axios.get('http://localhost:8000/categoria/')
       .then((res) => {
-        const categoriasFiltradas = res.data.filter((cat: Categoria) => cat.idCategoriaPadre !== null);
+        const categoriasFiltradas = res.data.filter((cat: Categoria) => cat.idCategoriaPadre); // Solo subcategorías
         setCategorias(categoriasFiltradas);
       })
       .catch((err) => console.error('Error al obtener categorías:', err));
@@ -69,26 +70,30 @@ const AdminProductos: React.FC = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Panel de Administración - Productos</h2>
+    <div className="container admin-productos-container">
+      <h2 className="mb-4">Panel de Administración - Productos</h2>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Filtrar por Categoría</Form.Label>
-        <Form.Select
-          value={categoriaSeleccionada}
-          onChange={(e) => {
-            setCategoriaSeleccionada(e.target.value);
-            setPaginaActual(1);
-          }}
-        >
-          <option value="">-- Todas las categorías --</option>
-          {categorias.map((cat) => (
-            <option key={cat.id_categoria} value={cat.id_categoria}>
-              {cat.nombreCategoria}
-            </option>
-          ))}
-        </Form.Select>
-      </Form.Group>
+      <Row className="mb-4">
+        <Col md={6} className="categoria-filtro">
+          <Form.Group>
+            <Form.Label><strong>Filtrar por Categoría</strong></Form.Label>
+            <Form.Select
+              value={categoriaSeleccionada}
+              onChange={(e) => {
+                setCategoriaSeleccionada(e.target.value);
+                setPaginaActual(1);
+              }}
+            >
+              <option value="">-- Todas las categorías --</option>
+              {categorias.map((cat) => (
+                <option key={cat.id_categoria} value={cat.id_categoria}>
+                  {cat.nombreCategoria}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        </Col>
+      </Row>
 
       <div className="table-responsive">
         <Table striped bordered hover>
@@ -133,7 +138,7 @@ const AdminProductos: React.FC = () => {
         </Table>
       </div>
 
-      <Pagination className="justify-content-center">
+      <Pagination className="justify-content-center mt-4">
         <Pagination.Prev onClick={() => cambiarPagina(paginaActual - 1)} disabled={paginaActual === 1} />
         {[...Array(totalPaginas)].map((_, index) => (
           <Pagination.Item
