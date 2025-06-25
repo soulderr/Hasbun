@@ -69,6 +69,82 @@ const Carrito: React.FC = () => {
     return carritoInvitado.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
   };
 
+  const [correoInvitado, setCorreoInvitado] = useState("");
+  const [nombreInvitado, setNombreInvitado] = useState("");
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+
+  const iniciarPago = async () => {
+    try {
+      const token = localStorage.getItem("access");
+      const rol = localStorage.getItem("rol");
+      const usuario_id = localStorage.getItem("usuario_id");
+
+      let productos;
+
+      if (rol === "0") {
+        productos = items.map(item => ({
+          id_producto: item.producto,
+          cantidad: item.cantidad,
+        }));
+      } else {
+        productos = carritoInvitado.map(item => ({
+          id_producto: item.idProducto,
+          cantidad: item.cantidad,
+        }));
+
+        if (!correoInvitado || !nombreInvitado) {
+          alert("Por favor completa tus datos.");
+          return;
+        }
+      }
+      
+      const response = await fetch("http://localhost:8000/venta/iniciar-pago/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(rol === "0" && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify({
+          usuario_id: rol === "0" ? usuario_id : null,
+          productos,
+          invitado: rol !== "0",
+          correo: correoInvitado,
+          nombre: nombreInvitado,
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("❌ Error en la respuesta:", text);
+        alert("Error al iniciar el pago. Revisa consola para más detalles.");
+        return;
+      }
+
+      const data = await response.json();
+      if (data.url && data.token) {
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = data.url;
+
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "token_ws";
+        input.value = data.token;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+      } else {
+        alert("Error al iniciar el pago");
+      }
+    } catch (error) {
+      console.error("Error al iniciar pago:", error);
+      alert("Hubo un error al intentar pagar.");
+    }
+  };
+
+
+
   return (
     <div className="container mt-4">
       <h2>Carrito de Compras</h2>
@@ -176,7 +252,44 @@ const Carrito: React.FC = () => {
               : calcularTotalInvitado().toLocaleString('es-CL')}
           </span>
         </h4>
-        <Button variant="danger"size="lg" className="mt-2">Proceder al pago</Button>
+        <Button variant="danger"size="lg"className="mt-2"onClick={() => {
+            if (isAuthenticated) {
+              iniciarPago();
+            } else {
+              setMostrarFormulario(true);
+            }
+          }}
+        >
+          Proceder al pago
+        </Button>
+        {!isAuthenticated && mostrarFormulario && (
+          <div className="mt-3">
+            <h5>Ingresa tus datos para continuar con el pago:</h5>
+            <Form>
+              <Form.Group controlId="correoInvitado" className="mb-2">
+                <Form.Label>Correo electrónico</Form.Label>
+                <Form.Control
+                  type="email"
+                  value={correoInvitado}
+                  onChange={(e) => setCorreoInvitado(e.target.value)}
+                  required
+                />
+              </Form.Group>
+              <Form.Group controlId="nombreInvitado" className="mb-2">
+                <Form.Label>Nombre</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={nombreInvitado}
+                  onChange={(e) => setNombreInvitado(e.target.value)}
+                  required
+                />
+              </Form.Group>
+              <Button variant="success" onClick={iniciarPago}>
+                Confirmar y Pagar
+              </Button>
+            </Form>
+          </div>
+        )}
       </div>
     </div>
   );

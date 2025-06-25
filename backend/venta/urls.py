@@ -1,10 +1,12 @@
-from django.urls import path, include
-from rest_framework import routers
-from venta import views
-
-router = routers.DefaultRouter()
-router.register('venta', views.VentaView, basename='venta')
+from django.urls import path
+from .views import IniciarPagoView
+from .views import confirmar_transaccion
+from .views import detalle_venta
+from .views import reintentar_pago
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('iniciar-pago/', IniciarPagoView.as_view(), name='iniciar_pago'),
+    path('confirmar-transaccion/', confirmar_transaccion, name='confirmar_transaccion'),
+    path('detalle-venta/', detalle_venta, name='detalle_venta'),
+    path('reintentar-pago/', reintentar_pago, name='reintentar_pago'),
 ]

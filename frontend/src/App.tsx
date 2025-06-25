@@ -21,6 +21,9 @@ import { FaWhatsapp } from 'react-icons/fa';
 import Dashboard from './pages/Dashboard';
 import AdminProductos from './admin/AdminProductos';
 import AdminMensajesContacto from './admin/AdminMensajesContacto'; // Importa el componente de mensajes de contacto
+import PagoExitoso from './pages/PagoExitoso';
+import PagoFallido from './pages/PagoFallido';
+
 function App() {
   return (
     <Router>
@@ -45,7 +48,8 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin/productos" element={<AdminProductos />} />
             <Route path="/admin/contacto" element={<AdminMensajesContacto />} /> {/* Ruta para mensajes de contacto */}
-
+            <Route path="/pago-exitoso" element={<PagoExitoso />} />
+            <Route path="/pago-fallido" element={<PagoFallido />} />
          
             {/* Agrega más rutas según sea necesario */}
           </Routes>
