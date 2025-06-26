@@ -24,11 +24,14 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 class UsuarioRegistroSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+
     class Meta:
         model = Usuario
-        fields = ['email', 'password']
-    
+        fields = ['email', 'password', 'first_name', 'last_name']
+
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data['password'])
-        validated_data['rol'] = 0  # ⚠️ Forzamos que sea usuario normal
+        validated_data['rol'] = 0  # usuario normal
         return super().create(validated_data)

@@ -17,6 +17,7 @@ from django.conf import settings
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import permissions
 from .serializers import MyTokenObtainPairSerializer
+from .utils import enviar_correo_bienvenida
 
 User = get_user_model()
 
@@ -28,21 +29,24 @@ class RegisterView(APIView):
         try:
             username = request.data['email']
             password = make_password(request.data['password'])
+            first_name = request.data.get('first_name', '')
+            last_name = request.data.get('last_name', '')
 
             if User.objects.filter(username=username).exists():
                 return Response({"error": "El usuario ya existe"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # ✅ Crear usuario con rol 0 (usuario normal)
             user = User.objects.create(
                 username=username,
                 email=username,
                 password=password,
-                rol=0  # ⚠️ Forzamos que sea usuario normal
+                first_name=first_name,
+                last_name=last_name,
+                rol=0
             )
+            
+            enviar_correo_bienvenida(user)
 
             refresh = RefreshToken.for_user(user)
-
-            # Añadir 'rol' al token access manualmente
             access_token = refresh.access_token
             access_token['rol'] = user.rol
 

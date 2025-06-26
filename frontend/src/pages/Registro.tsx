@@ -11,7 +11,10 @@ function Registro() {
     email: '',
     password: '',
     confirmPassword: '',
+    firstName: '',
+    lastName: '',
   });
+
 
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -38,6 +41,8 @@ function Registro() {
         username: formData.email,
         email: formData.email,
         password: formData.password,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
       });
 
       setSuccess('Registro exitoso');
@@ -54,6 +59,8 @@ function Registro() {
       //window.location.href = '/login';
       // Limpia el formulario
       setFormData({
+        firstName: '',
+        lastName: '',
         email: '',
         password: '',
         confirmPassword: '',
@@ -73,7 +80,32 @@ function Registro() {
 
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {success && <p style={{ color: 'green' }}>{success}</p>}
+            <Form.Group className="mb-3">
+              <Form.Label>Nombre</Form.Label>
+              <Form.Control
+                required
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="Ingresa tu nombre"
+                className="input-dark"
+              />
+            </Form.Group>
 
+            <Form.Group className="mb-3">
+              <Form.Label>Apellido</Form.Label>
+              <Form.Control
+                required
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                placeholder="Ingresa tu apellido"
+                className="input-dark"
+              />
+            </Form.Group>
+            
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control
