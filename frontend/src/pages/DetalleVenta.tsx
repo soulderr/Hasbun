@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 
+
 interface ProductoDetalle {
   nombre: string;
   cantidad: number;
@@ -17,17 +18,19 @@ interface DetalleVenta {
   estado: string;
   productos: ProductoDetalle[];
 }
-const handleDescargarPDF = () => {
-  if (orden) {
-    window.open(`http://localhost:8000/venta/pdf/${orden}/`, "_blank");
-  }
-};
+
 
 const DetalleVenta: React.FC = () => {
   const [venta, setVenta] = useState<DetalleVenta | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
-  const orden = searchParams.get("orden");
+  const orden = searchParams.get("orden");  
+
+  const handleDescargarPDF = () => {
+    if (orden) {
+        window.open(`http://localhost:8000/venta/pdf/${orden}/`, "_blank");
+    }
+    };
 
   useEffect(() => {
     const fetchVenta = async () => {
@@ -101,7 +104,7 @@ const DetalleVenta: React.FC = () => {
                 <tr>
                 <td colSpan={4} className="text-center">
                     <button className="btn btn-outline-danger" onClick={handleDescargarPDF}>
-                    Descargar PDF
+                        Descargar PDF
                     </button>
                 </td>
                 </tr>
