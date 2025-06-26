@@ -1,0 +1,27 @@
+<h2>Detalle de Venta</h2>
+<p><strong>Orden:</strong> {{ venta.orden_compra }}</p>
+<p><strong>Cliente:</strong> {{ venta.id_usuario.email }}</p>
+<p><strong>Fecha:</strong> {{ venta.fecha_venta }}</p>
+
+<table border="1" cellspacing="0" cellpadding="4">
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th>Cantidad</th>
+      <th>Precio</th>
+      <th>Subtotal</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for detalle in venta.detalles.all %}
+    <tr>
+      <td>{{ detalle.id_producto.nombreProducto }}</td>
+      <td>{{ detalle.cantidad }}</td>
+      <td>${{ detalle.precio_unitario }}</td>
+      <td>${{ detalle.subtotal }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<p><strong>Total:</strong> ${{ venta.total }}</p>

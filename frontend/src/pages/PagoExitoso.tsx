@@ -1,43 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
-const PagoExitoso: React.FC = () => {
+const PagoExitoso = () => {
   const [searchParams] = useSearchParams();
-  const orden = searchParams.get('orden');
+  const orden = searchParams.get("orden");
+  const navigate = useNavigate();
 
-  const [venta, setVenta] = useState<any>(null);
-
-  useEffect(() => {
+  const irADetalle = () => {
     if (orden) {
-      axios.get(`http://localhost:8000/detalle-venta/?orden=${orden}`)
-        .then(res => setVenta(res.data))
-        .catch(err => console.error('Error al cargar la venta:', err));
+      navigate(`/detalle-venta?orden=${orden}`);
     }
-  }, [orden]);
+  };
 
   return (
-    <div className="container mt-5">
-      <h2 className="text-success text-center">✅ ¡Pago exitoso!</h2>
-      {venta ? (
-        <div className="mt-4">
-          <p><strong>Venta:</strong> #{venta.idVenta}</p>
-          <p><strong>Usuario:</strong> {venta.usuario}</p>
-          <p><strong>Fecha:</strong> {new Date(venta.fecha).toLocaleString()}</p>
-          <h4>Productos:</h4>
-          <ul>
-            {venta.productos.map((item: any, index: number) => (
-              <li key={index}>
-                {item.nombre} — {item.cantidad} x ${item.precio_unitario} = ${item.subtotal}
-              </li>
-            ))}
-          </ul>
-          <h5 className="mt-3">💰 Total pagado: ${venta.total}</h5>
-        </div>
-      ) : (
-        <p>Cargando detalles de la venta...</p>
-      )}
-      <a href="/" className="btn btn-success mt-4">Volver al inicio</a>
+    <div className="text-center mt-5">
+      <h2>✅ ¡Pago realizado con éxito!</h2>
+      <p>Orden de compra generada: <strong>{orden}</strong></p>
+      <button className="btn btn-primary mt-3" onClick={irADetalle}>
+        Ver detalle de la venta
+      </button>
     </div>
   );
 };

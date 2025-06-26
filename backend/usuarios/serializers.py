@@ -20,7 +20,8 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
         data = super().validate(attrs)
-        data['rol'] = self.user.rol  # opcional: incluye en respuesta JSON
+        data['rol'] = self.user.rol
+        data['usuario_id'] = self.user.id  # ✅ Agregar el ID del usuario
         return data
 
 class UsuarioRegistroSerializer(serializers.ModelSerializer):

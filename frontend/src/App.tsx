@@ -9,7 +9,7 @@ import Registro from './pages/Registro';
 import Login from './pages/Login';
 import Inventario from './pages/Inventario';
 import Contacto from './pages/Contacto';
-import ProductoDetalle from './pages/ProductoDetalle'; // Importa el componente de detalles del producto
+import ProductoDetalle from './pages/ProductoDetalle'; 
 import './App.css';
 import PrivateRoute from './pages/PrivateRoute';
 import CategoriaProducto from './pages/CategoriaProducto';
@@ -20,10 +20,10 @@ import Visitanos from './pages/Visitanos';
 import { FaWhatsapp } from 'react-icons/fa';
 import Dashboard from './pages/Dashboard';
 import AdminProductos from './admin/AdminProductos';
-import AdminMensajesContacto from './admin/AdminMensajesContacto'; // Importa el componente de mensajes de contacto
+import AdminMensajesContacto from './admin/AdminMensajesContacto'; 
 import PagoExitoso from './pages/PagoExitoso';
 import PagoFallido from './pages/PagoFallido';
-
+import DetalleVenta from './pages/DetalleVenta'; 
 function App() {
   return (
     <Router>
@@ -50,7 +50,7 @@ function App() {
             <Route path="/admin/contacto" element={<AdminMensajesContacto />} /> {/* Ruta para mensajes de contacto */}
             <Route path="/pago-exitoso" element={<PagoExitoso />} />
             <Route path="/pago-fallido" element={<PagoFallido />} />
-         
+            <Route path="/detalle-venta" element={<DetalleVenta />} />
             {/* Agrega más rutas según sea necesario */}
           </Routes>
         </main>

@@ -23,6 +23,13 @@ User = get_user_model()
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        data['rol'] = self.user.rol
+        data['usuario_id'] = self.user.id  # ✅ Esto agrega el ID del usuario
+
+        return data
 
 class RegisterView(APIView):
     def post(self, request):
@@ -43,7 +50,7 @@ class RegisterView(APIView):
                 last_name=last_name,
                 rol=0
             )
-            
+
             enviar_correo_bienvenida(user)
 
             refresh = RefreshToken.for_user(user)
@@ -54,6 +61,7 @@ class RegisterView(APIView):
                 'refresh': str(refresh),
                 'access': str(access_token),
                 'rol': user.rol,
+                "usuario_id": user.id,
             })
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

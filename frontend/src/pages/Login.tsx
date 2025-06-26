@@ -20,9 +20,11 @@ function Login() {
         password,
       });
 
-      const { access, refresh } = response.data;
-      localStorage.setItem('access', access);
-      localStorage.setItem('refresh', refresh);
+      const { access, refresh, rol, usuario_id } = response.data;
+      localStorage.setItem("access", response.data.access);
+      localStorage.setItem("refresh", response.data.refresh);
+      localStorage.setItem("rol", response.data.rol.toString());
+      localStorage.setItem("usuario_id", response.data.usuario_id.toString());
       // 🛒 Buscar carrito existente o crear uno nuevo
       try {
         const carritoResponse = await api.get('http://127.0.0.1:8000/carrito/', {

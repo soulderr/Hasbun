@@ -1,6 +1,9 @@
 .header {
   width: 100%;
   box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
 }
 
 .navbar-brand img {

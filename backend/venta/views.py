@@ -2,13 +2,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404, redirect
-from transbank.webpay.webpay_plus.transaction import Transaction, WebpayOptions
+from transbank.webpay.webpay_plus.transaction import Transaction
+from transbank.common.options import WebpayOptions
+from transbank.common.integration_type import IntegrationType
 from transbank.common.integration_commerce_codes import IntegrationCommerceCodes
 from transbank.common.integration_api_keys import IntegrationApiKeys
 import uuid
 from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse, HttpResponseBadRequest
+from xhtml2pdf import pisa
+from django.template.loader import get_template
 from django.http import HttpResponse
-
 from venta.models import Venta
 from detalleVenta.models import DetalleVenta
 from producto.models import Producto
@@ -16,6 +20,9 @@ from usuarios.models import Usuario
 import os 
 from dotenv import load_dotenv  
 load_dotenv()  
+
+
+
 
 def obtener_webpay_options():
     tipo = os.getenv("TRANSBANK_ENV", "TEST")
@@ -76,6 +83,10 @@ class IniciarPagoView(APIView):
         venta.save()
 
         return_url = os.getenv("RETURN_URL")
+        
+        # 👇✅ Agrega este print para verificar que estás mandando la URL correcta
+
+        print("📦 Return URL enviado a Webpay:", return_url)
 
         tx = Transaction(obtener_webpay_options())
 
@@ -92,30 +103,28 @@ class IniciarPagoView(APIView):
 
 @csrf_exempt
 def confirmar_transaccion(request):
-    if request.method == 'POST':
-        token = request.POST.get('token_ws')
+    token = request.POST.get('token_ws') or request.GET.get('token_ws')
+    if not token:
+        return HttpResponseBadRequest("Token no proporcionado")
 
-        try:
-            tx = Transaction()
-            response = tx.commit(token)
+    try:
+        options = obtener_webpay_options()  # ✅ Corrección aquí
+        transaccion = Transaction(options)
+        response = transaccion.commit(token)
 
-            orden = response.get('buy_order')
-            status = response.get('status')  # "AUTHORIZED", etc.
+        print("🔄 Resultado Transacción:", response)
 
-            venta = Venta.objects.get(orden_compra=orden)
-            venta.estado = 'pagado' if status == 'AUTHORIZED' else 'fallido'
+        if response['status'] == 'AUTHORIZED':
+            venta = Venta.objects.get(orden_compra=response['buy_order'])
+            venta.estado = 'pagado'
             venta.save()
+            return redirect(f'http://localhost:5173/pago-exitoso?orden={venta.orden_compra}')
+        else:
+            return redirect(f'http://localhost:5173/pago-fallido?orden={response["buy_order"]}')
+    except Exception as e:
+        print("❌ Error al confirmar transacción:", e)
+        return redirect('http://localhost:5173/pago-fallido')
 
-            if status == 'AUTHORIZED':
-                return redirect(f'http://localhost:5173/pago-exitoso?orden={orden}')
-            else:
-                return redirect('http://localhost:5173/pago-fallido')
-
-        except Exception as e:
-            print(f"Error al confirmar transacción: {e}")
-            return redirect('http://localhost:5173/pago-fallido')
-    else:
-        return HttpResponse("Método no permitido", status=405)
     
 @api_view(['GET'])
 def detalle_venta(request):
@@ -123,7 +132,7 @@ def detalle_venta(request):
 
     try:
         venta = Venta.objects.get(orden_compra=orden)
-        detalles = venta.detalles.all()  # gracias a related_name='detalles'
+        detalles = venta.detalles.all()
 
         data = {
             'idVenta': venta.idVenta,
@@ -133,7 +142,7 @@ def detalle_venta(request):
             'estado': venta.estado,
             'productos': [
                 {
-                    'nombre': d.id_producto.nombreProducto,
+                    'nombre': d.id_producto.nombreProducto if d.id_producto else "N/D",
                     'cantidad': d.cantidad,
                     'precio_unitario': float(d.precio_unitario),
                     'subtotal': float(d.subtotal),
@@ -173,3 +182,14 @@ def reintentar_pago(request):
     except Venta.DoesNotExist:
         return Response({'error': 'Venta no encontrada'}, status=404)
     
+def generar_pdf_venta(request, orden):
+    try:
+        venta = Venta.objects.get(orden_compra=orden)
+        template = get_template('venta/pdf_venta.html')  # Asegúrate de crear esta plantilla
+        html = template.render({'venta': venta})
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="venta_{orden}.pdf"'
+        pisa.CreatePDF(html, dest=response)
+        return response
+    except Venta.DoesNotExist:
+        return HttpResponse("Venta no encontrada", status=404)

@@ -35,6 +35,7 @@ const Carrito: React.FC = () => {
       }
     };
 
+
     cargarCarrito();
     window.addEventListener('carritoActualizado', cargarCarrito);
 
@@ -97,7 +98,7 @@ const Carrito: React.FC = () => {
           return;
         }
       }
-      
+  
       const response = await fetch("http://localhost:8000/venta/iniciar-pago/", {
         method: "POST",
         headers: {
