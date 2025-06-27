@@ -18,7 +18,9 @@ from detalleVenta.models import DetalleVenta
 from producto.models import Producto
 from usuarios.models import Usuario
 import os 
+import base64
 from dotenv import load_dotenv  
+from django.conf import settings
 load_dotenv()  
 
 
@@ -185,11 +187,28 @@ def reintentar_pago(request):
 def generar_pdf_venta(request, orden):
     try:
         venta = Venta.objects.get(orden_compra=orden)
-        template = get_template('venta/pdf_venta.html')  # Asegúrate de crear esta plantilla
-        html = template.render({'venta': venta})
-        response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="venta_{orden}.pdf"'
-        pisa.CreatePDF(html, dest=response)
-        return response
+        template = get_template('venta/pdf_venta.html')
+
+        # Codificar la imagen como base64
+        logo_path = os.path.join(settings.BASE_DIR, 'static', 'logo.png')
+        with open(logo_path, "rb") as image_file:
+            logo_base64 = base64.b64encode(image_file.read()).decode('utf-8')
+
+        html = template.render({
+            'venta': venta,
+            'logo_base64': logo_base64,
+        })
+
+        output_path = os.path.join(settings.MEDIA_ROOT, f'ventas/venta_{orden}.pdf')
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+        with open(output_path, "wb") as f:
+            pisa.CreatePDF(html, dest=f)
+
+        with open(output_path, "rb") as f:
+            response = HttpResponse(f.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="venta_{orden}.pdf"'
+            return response
+
     except Venta.DoesNotExist:
         return HttpResponse("Venta no encontrada", status=404)
