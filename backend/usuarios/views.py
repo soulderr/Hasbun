@@ -38,7 +38,9 @@ class RegisterView(APIView):
             password = make_password(request.data['password'])
             first_name = request.data.get('first_name', '')
             last_name = request.data.get('last_name', '')
-
+            rut = request.data.get('rut', '')
+            direccion = request.data.get('direccion', '')
+            
             if User.objects.filter(username=username).exists():
                 return Response({"error": "El usuario ya existe"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -48,6 +50,8 @@ class RegisterView(APIView):
                 password=password,
                 first_name=first_name,
                 last_name=last_name,
+                rut=rut,
+                direccion=direccion,
                 rol=0
             )
 

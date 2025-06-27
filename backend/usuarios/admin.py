@@ -4,11 +4,11 @@ from django.contrib.auth.admin import UserAdmin
 
 class UsuarioAdmin(UserAdmin):
     model = Usuario
-    list_display = ('email', 'username', 'first_name', 'last_name', 'rol', 'is_staff', 'is_active')
+    list_display = ('email', 'username', 'first_name', 'last_name', 'rut', 'direccion', 'rol', 'is_staff', 'is_active')
     list_filter = ('rol', 'is_staff', 'is_active')
     fieldsets = (
         (None, {
-            'fields': ('username', 'email', 'password', 'first_name', 'last_name', 'rol')
+            'fields': ('username', 'email', 'password', 'first_name', 'last_name', 'rut', 'direccion', 'rol')
         }),
         ('Permisos', {
             'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')
@@ -19,11 +19,11 @@ class UsuarioAdmin(UserAdmin):
             'classes': ('wide',),
             'fields': (
                 'username', 'email', 'password1', 'password2',
-                'first_name', 'last_name', 'rol', 'is_staff', 'is_active'
+                'first_name', 'last_name', 'rut', 'direccion', 'rol', 'is_staff', 'is_active'
             ),
         }),
     )
-    search_fields = ('email', 'first_name', 'last_name')
+    search_fields = ('email', 'first_name', 'last_name', 'rut')
     ordering = ('email',)
 
 admin.site.register(Usuario, UsuarioAdmin)
