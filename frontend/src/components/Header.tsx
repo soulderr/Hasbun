@@ -157,6 +157,9 @@ const Header: React.FC = () => {
                     <Link to="/contacto" className="nav-link" onClick={closeMenu}>Contacto</Link>
                   </li>
                   <li className="nav-item">
+                    <Link to="/venta/historial" className="nav-link" onClick={closeMenu}>Historial Compras</Link>
+                  </li>
+                  <li className="nav-item">
                     <Link to="/visitanos" className="nav-link" onClick={closeMenu}>Visítanos</Link>
                   </li>
                   <li className="nav-item">

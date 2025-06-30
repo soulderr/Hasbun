@@ -4,6 +4,7 @@ from .views import confirmar_transaccion
 from .views import detalle_venta
 from .views import reintentar_pago
 from .views import generar_pdf_venta
+from .views import historial_compras
 
 urlpatterns = [
     path('iniciar-pago/', IniciarPagoView.as_view(), name='iniciar_pago'),
@@ -11,5 +12,5 @@ urlpatterns = [
     path('detalle-venta/', detalle_venta, name='detalle_venta'),
     path('reintentar-pago/', reintentar_pago, name='reintentar_pago'),
     path('pdf/<str:orden>/', generar_pdf_venta, name='generar_pdf'),
-
+    path('historial/', historial_compras, name='historial_compras'),
 ]

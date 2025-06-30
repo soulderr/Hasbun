@@ -1,6 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404, redirect
 from transbank.webpay.webpay_plus.transaction import Transaction
 from transbank.common.options import WebpayOptions
@@ -212,3 +214,29 @@ def generar_pdf_venta(request, orden):
 
     except Venta.DoesNotExist:
         return HttpResponse("Venta no encontrada", status=404)
+
+class CustomPagination(PageNumberPagination):
+    page_size = 5  # Solo 5 por página
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def historial_compras(request):
+    usuario = request.user
+    ventas = Venta.objects.filter(id_usuario=usuario, estado='pagado').order_by('-fecha_venta')
+
+    paginator = CustomPagination()
+    paginated_ventas = paginator.paginate_queryset(ventas, request)
+
+    data = []
+    for venta in paginated_ventas:
+        data.append({
+            'orden': venta.orden_compra,
+            'fecha': venta.fecha_venta,
+            'total': float(venta.total),
+            'estado': venta.estado,
+            'pdf_url': f"http://localhost:8000/venta/pdf/{venta.orden_compra}/"
+        })
+
+    return paginator.get_paginated_response(data)
