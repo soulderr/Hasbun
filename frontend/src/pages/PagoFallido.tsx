@@ -59,10 +59,10 @@ const PagoFallido: React.FC = () => {
           <p><strong>Total:</strong> ${venta.total}</p>
         </div>
       )}
-
-      <button className="btn btn-warning mt-3" onClick={reintentarPago} disabled={loading}>
+      
+      {/*<button className="btn btn-warning mt-3" onClick={reintentarPago} disabled={loading}>
         {loading ? 'Redirigiendo...' : 'Reintentar pago'}
-      </button>
+      </button>*/}
     </div>
   );
 };
