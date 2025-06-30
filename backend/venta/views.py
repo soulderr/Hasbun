@@ -1,9 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.pagination import PageNumberPagination
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from transbank.webpay.webpay_plus.transaction import Transaction
 from transbank.common.options import WebpayOptions
 from transbank.common.integration_type import IntegrationType
@@ -23,6 +23,7 @@ import os
 import base64
 from dotenv import load_dotenv  
 from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
 load_dotenv()  
 
 
@@ -240,3 +241,15 @@ def historial_compras(request):
         })
 
     return paginator.get_paginated_response(data)
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def lista_pdfs_ventas(request):
+    ventas = Venta.objects.all()
+    data = []
+    for venta in ventas:
+        data.append({
+            "orden": venta.orden_compra,
+            "pdf_url": f"http://localhost:8000/media/ventas/venta_{venta.orden_compra}.pdf"
+        })
+    return Response(data)

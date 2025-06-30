@@ -25,6 +25,8 @@ import PagoExitoso from './pages/PagoExitoso';
 import PagoFallido from './pages/PagoFallido';
 import DetalleVenta from './pages/DetalleVenta';
 import HistorialCompras from './pages/HistorialCompras'; 
+import AdminListaPDFs from './pages/AdminListaPDFs';
+
 function App() {
   return (
     <Router>
@@ -53,6 +55,7 @@ function App() {
             <Route path="/pago-fallido" element={<PagoFallido />} />
             <Route path="/detalle-venta" element={<DetalleVenta />} />
             <Route path="/venta/historial" element={<HistorialCompras />} />
+            <Route path="/venta/admin/pdf-lista" element={<AdminListaPDFs />} /> {/* Ruta para listar PDFs de ventas */}
             {/* Agrega más rutas según sea necesario */}
           </Routes>
         </main>
