@@ -25,7 +25,8 @@ const ProductoDetalle: React.FC = () => {
   const [product, setProduct] = useState<ApiProduct | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const [carritoAuth, setCarritoAuth] = useState<any[]>([]);
+
   useEffect(() => {
     const fetchProductDetails = async () => {
       if (!id) {
@@ -60,6 +61,30 @@ const ProductoDetalle: React.FC = () => {
     fetchProductDetails();
   }, [id]);
 
+  useEffect(() => {
+    const access = localStorage.getItem('access');
+    if (!access) return;
+
+    const fetchCarrito = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/carrito/items/', {
+          headers: {
+            Authorization: `Bearer ${access}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCarritoAuth(data); // Guarda los productos actuales
+        }
+      } catch (err) {
+        console.error('Error al cargar carrito del usuario:', err);
+      }
+    };
+
+    fetchCarrito();
+  }, []);
+
   const formatPrice = (priceString: string | null) => {
     if (!priceString) return 'No disponible';
     const priceNumber = parseFloat(priceString);
@@ -73,67 +98,98 @@ const ProductoDetalle: React.FC = () => {
   };
   
   const agregarAlCarrito = async () => {
-  if (!product) return;
+    if (!product) return;
 
-  const access = localStorage.getItem('access');
-  const carritoId = localStorage.getItem('carritoId');
+    const access = localStorage.getItem('access');
 
-  const item = {
-  producto: product.idProducto,
-  cantidad: 1,
-  precio_unitario: parseFloat(product.precioNeto),
-};
+    const item = {
+      producto: product.idProducto,
+      cantidad: 1,
+      precio_unitario: parseFloat(product.precioNeto),
+    };
 
-  console.log("🟨 Item a enviar:", item);
-  
-  if (access ) {
-    try {
-      const response = await fetch('http://127.0.0.1:8000/carrito/items/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${access}`,
-        },
-        body: JSON.stringify(item),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('🔴 Error del backend:', errorData);
-        throw new Error(JSON.stringify(errorData));
+    console.log("🟨 Item a enviar:", item);
+
+    // ✅ Modo autenticado
+    if (access) {
+      // ✅ Verifica si ya tiene el producto en el carrito
+      const existente = carritoAuth.find((item: any) => item.producto === product.idProducto);
+      const cantidadActual = existente?.cantidad || 0;
+
+      if (cantidadActual >= product.stock) {
+        alert(`Ya tienes el máximo disponible (${product.stock}) en el carrito.`);
+        return;
       }
 
-      window.dispatchEvent(new Event('carritoActualizado'));
-      alert('Producto agregado al carrito (usuario autenticado)');
-    } catch (error) {
-      console.error('❌ Error al agregar al carrito autenticado:', error);
-      alert('No se pudo agregar el producto al carrito (autenticado)');
-    }
+      try {
+        const response = await fetch('http://127.0.0.1:8000/carrito/items/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${access}`,
+          },
+          body: JSON.stringify(item),
+        });
 
-  } else {
-    // Usuario invitado
-    const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('🔴 Error del backend:', errorData);
+          alert(errorData.detail || 'Error al agregar al carrito (autenticado)');
+          return;
+        }
 
-    const indiceExistente = carrito.findIndex(
-      (p: any) => p.idProducto === product.idProducto
-    );
+        // ✅ Actualiza carrito local del autenticado
+        const nuevoItem = await response.json();
+        setCarritoAuth(prev => {
+          const yaExiste = prev.find(p => p.producto === nuevoItem.producto);
+          if (yaExiste) {
+            return prev.map(p =>
+              p.producto === nuevoItem.producto ? { ...p, cantidad: nuevoItem.cantidad } : p
+            );
+          } else {
+            return [...prev, nuevoItem];
+          }
+        });
 
-    if (indiceExistente !== -1) {
-      carrito[indiceExistente].cantidad += 1;
+        window.dispatchEvent(new Event('carritoActualizado'));
+        alert('Producto agregado al carrito (usuario autenticado)');
+      } catch (error) {
+        console.error('❌ Error al agregar al carrito autenticado:', error);
+        alert('No se pudo agregar el producto al carrito (autenticado)');
+      }
+    // ✅ Modo invitado
     } else {
-      carrito.push({
-        idProducto: product.idProducto,
-        nombreProducto: product.nombreProducto,
-        imagen: product.imagen,
-        precio: parseFloat(product.precioNeto),
-        cantidad: 1,
-      });
-    }
+      const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
 
-    localStorage.setItem('carrito', JSON.stringify(carrito));
-    window.dispatchEvent(new Event('carritoActualizado'));
-    alert('Producto agregado al carrito (sin sesión)');
-  }
-};
+      const indiceExistente = carrito.findIndex(
+        (p: any) => p.idProducto === product.idProducto
+      );
+
+      if (indiceExistente !== -1) {
+        // 🛑 Validación de stock
+        if (carrito[indiceExistente].cantidad >= product.stock) {
+          alert(`Ya tienes el máximo disponible (${product.stock}) en el carrito.`);
+          return;
+        }
+
+        carrito[indiceExistente].cantidad += 1;
+      } else {
+        carrito.push({
+          idProducto: product.idProducto,
+          nombreProducto: product.nombreProducto,
+          imagen: product.imagen,
+          precio: parseFloat(product.precioNeto),
+          cantidad: 1,
+          stock: product.stock, // ✅ stock incluido
+        });
+      }
+
+      localStorage.setItem('carrito', JSON.stringify(carrito));
+      window.dispatchEvent(new Event('carritoActualizado'));
+      alert('Producto agregado al carrito (sin sesión)');
+    }
+  };
+
 
   console.log(product)
 
@@ -186,11 +242,16 @@ const ProductoDetalle: React.FC = () => {
       </div>
     
       <div className="acciones-producto">
-        <button className="btn btn-outline-danger" onClick={agregarAlCarrito}>
+        <button
+          className="btn btn-outline-danger"
+          onClick={agregarAlCarrito}
+          disabled={product.stock === 0} // ✅ desactiva si stock es 0
+        >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-cart" viewBox="0 0 16 16">
             <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
           </svg> Agregar al carrito
         </button>
+
         <button className="btn btn-outline-danger" onClick={descargarFichaTecnica}>
           Descargar ficha técnica
         </button>

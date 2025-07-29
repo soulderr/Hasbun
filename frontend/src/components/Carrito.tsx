@@ -16,6 +16,7 @@ interface ProductoInvitado {
   imagen?: string | null;
   precio: number;
   cantidad: number;
+  stock: number;
 }
 
 const Carrito: React.FC = () => {
@@ -31,18 +32,30 @@ const Carrito: React.FC = () => {
         dispatch(fetchCarrito());
       } else {
         const localCarrito = localStorage.getItem('carrito');
-        setCarritoInvitado(localCarrito ? JSON.parse(localCarrito) : []);
+        const carrito = localCarrito ? JSON.parse(localCarrito) : [];
+
+        // 🔧 Corregir cantidades inválidas
+        const carritoCorregido = carrito.map((item: ProductoInvitado) => ({
+          ...item,
+          cantidad:
+            typeof item.cantidad === 'number' && !isNaN(item.cantidad) && item.cantidad > 0
+              ? item.cantidad
+              : 1,
+          stock:
+            typeof item.stock === 'number' && !isNaN(item.stock) && item.stock > 0
+              ? item.stock
+              : 9999, // ⚠️ fallback solo si no viene stock
+        }));
+
+        setCarritoInvitado(carritoCorregido);
       }
     };
 
-
     cargarCarrito();
     window.addEventListener('carritoActualizado', cargarCarrito);
-
-    return () => {
-      window.removeEventListener('carritoActualizado', cargarCarrito);
-    };
+    return () => window.removeEventListener('carritoActualizado', cargarCarrito);
   }, [dispatch, isAuthenticated]);
+
 
   const actualizarCantidad = (id: number, cantidad: number) => {
     dispatch(actualizarCantidadThunk({ id, cantidad }));
@@ -52,13 +65,26 @@ const Carrito: React.FC = () => {
     dispatch(eliminarItemThunk(id));
   };
 
-  const actualizarCantidadInvitado = (idProducto: string, cantidad: number) => {
-    const nuevoCarrito = carritoInvitado.map(item =>
-      item.idProducto === idProducto ? { ...item, cantidad } : item
-    );
-    setCarritoInvitado(nuevoCarrito);
+  const actualizarCantidadInvitado = (idProducto: string, nuevaCantidad: number) => {
+    const nuevoCarrito = carritoInvitado.map(item => {
+      if (item.idProducto === idProducto) {
+        const cantidadMaxima = item.stock ?? 9999;
+
+        if (nuevaCantidad > cantidadMaxima) {
+          alert(`⚠️ Solo hay ${cantidadMaxima} unidades disponibles de "${item.nombreProducto}".`);
+        }
+
+        const cantidadValida = Math.min(nuevaCantidad, cantidadMaxima);
+
+        return { ...item, cantidad: cantidadValida };
+      }
+      return item;
+    });
+
+    setCarritoInvitado([...nuevoCarrito]);
     localStorage.setItem('carrito', JSON.stringify(nuevoCarrito));
   };
+
 
   const eliminarItemInvitado = (idProducto: string) => {
     const nuevoCarrito = carritoInvitado.filter(item => item.idProducto !== idProducto);
@@ -217,13 +243,14 @@ const Carrito: React.FC = () => {
                     <Form.Control
                       type="number"
                       min={1}
+                      max={item.stock}
                       value={item.cantidad}
-                      onChange={e =>
-                        actualizarCantidadInvitado(
-                          item.idProducto,
-                          parseInt(e.target.value)
-                        )
-                      }
+                      onChange={e => {
+                        const valor = parseInt(e.target.value);
+                        if (!isNaN(valor)) {
+                          actualizarCantidadInvitado(item.idProducto, valor);
+                        }
+                      }}
                       style={{ width: '80px' }}
                     />
                   </td>

@@ -229,9 +229,6 @@ const Header: React.FC = () => {
                   <Link to="/admin/contacto" className="nav-link" onClick={closeMenu}>Contacto</Link>
                 </li>
                 <li className="nav-item">
-                  <Link to="/visitanos" className="nav-link" onClick={closeMenu}>Visítanos</Link>
-                </li>
-                <li className="nav-item">
                   <button type="button" className="btn btn-outline-danger" onClick={handleLogout}>
                       Cerrar Sesión
                   </button>
