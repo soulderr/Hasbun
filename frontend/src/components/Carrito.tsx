@@ -58,6 +58,7 @@ const Carrito: React.FC = () => {
 
 
   const actualizarCantidad = (id: number, cantidad: number) => {
+    if (isNaN(cantidad) || cantidad < 1) return;
     dispatch(actualizarCantidadThunk({ id, cantidad }));
   };
 
@@ -201,10 +202,15 @@ const Carrito: React.FC = () => {
                     <Form.Control
                       type="number"
                       min={1}
+                      max={item.producto_detalle?.stock}
                       value={item.cantidad}
-                      onChange={e =>
-                        actualizarCantidad(item.id, parseInt(e.target.value))
-                      }
+                      onChange={e => {
+                        const valor = parseInt(e.target.value);
+                        if (!isNaN(valor)) {
+                          actualizarCantidad(item.id, valor);
+                        }
+                      }}
+                      disabled={item.producto_detalle?.stock === 0}
                       style={{ width: '80px' }}
                     />
                   </td>

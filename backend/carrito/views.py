@@ -79,6 +79,8 @@ class VaciarCarritoView(APIView):
         return Response({'mensaje': 'Carrito vaciado exitosamente'}, status=status.HTTP_200_OK)
 
 class ItemCarritoDetalleView(RetrieveUpdateDestroyAPIView):
-    queryset = ItemCarrito.objects.all()
     serializer_class = ItemCarritoSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return ItemCarrito.objects.filter(carrito__usuario=self.request.user)

@@ -5,6 +5,7 @@ interface ProductoDetalle {
   idProducto: string;
   nombreProducto: string;
   imagen?: string;
+  stock: number;
 }
 
 interface ItemCarrito {
@@ -54,8 +55,8 @@ export const actualizarCantidadThunk = createAsyncThunk(
   'carrito/actualizarCantidad',
   async ({ id, cantidad }: { id: number; cantidad: number }, thunkAPI) => {
     try {
-      await api.put(`/carrito/items/${id}/`, { cantidad });
-      thunkAPI.dispatch(fetchCarrito());
+      const response = await api.patch(`/carrito/items/${id}/`, { cantidad });
+      return response.data; // ✅ devolvemos el item actualizado
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data || 'Error al actualizar cantidad');
     }
@@ -68,6 +69,7 @@ export const eliminarItemThunk = createAsyncThunk(
   async (id: number, thunkAPI) => {
     try {
       await api.delete(`/carrito/items/${id}/`);
+      console.log('Token de acceso actual:', localStorage.getItem('access'));
       thunkAPI.dispatch(fetchCarrito());
     } catch (error: any) {
       return thunkAPI.rejectWithValue(error.response?.data || 'Error al eliminar item');
@@ -97,7 +99,22 @@ const carritoSlice = createSlice({
       .addCase(fetchCarrito.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(actualizarCantidadThunk.fulfilled, (state, action) => {
+        const index = state.items.findIndex(item => item.id === action.payload.id);
+        if (index !== -1) {
+          state.items[index].cantidad = action.payload.cantidad;
+          state.items[index].precio_unitario = action.payload.precio_unitario;
+        }
+
+        // Recalcular total y cantidadTotal
+        state.total = state.items.reduce(
+          (acc, item) => acc + item.cantidad * parseFloat(item.precio_unitario.toString()),
+          0
+        );
+        state.cantidadTotal = state.items.reduce((acc, item) => acc + item.cantidad, 0);
       });
+
   },
 });
 

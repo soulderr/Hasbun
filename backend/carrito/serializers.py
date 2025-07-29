@@ -11,7 +11,7 @@ class ProductoInfoSerializer(serializers.ModelSerializer):
 class ProductoMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = Producto
-        fields = ['idProducto', 'nombreProducto', 'imagen']
+        fields = ['idProducto', 'nombreProducto', 'imagen', 'stock']
 
 class ItemCarritoSerializer(serializers.ModelSerializer):
     producto = serializers.PrimaryKeyRelatedField(queryset=Producto.objects.all())
@@ -23,21 +23,26 @@ class ItemCarritoSerializer(serializers.ModelSerializer):
         read_only_fields = ['carrito', 'fecha_agregado']
 
     def validate(self, data):
-        producto = data['producto']
-        cantidad = data['cantidad']
+        # Si es actualización parcial, usar el producto existente
+        producto = data.get('producto', getattr(self.instance, 'producto', None))
+        cantidad = data.get('cantidad', getattr(self.instance, 'cantidad', None))
 
-        if producto.stock < cantidad:
-            raise serializers.ValidationError(f"Solo hay {producto.stock} unidades disponibles.")
+        if producto and cantidad and producto.stock < cantidad:
+            raise serializers.ValidationError(
+                f"Solo hay {producto.stock} unidades disponibles."
+            )
         
         return data
 
     def update(self, instance, validated_data):
-        instance.cantidad = validated_data.get('cantidad', instance.cantidad)
+        nueva_cantidad = validated_data.get('cantidad', instance.cantidad)
 
-        # Validar nuevamente en caso de update manual
-        if instance.producto.stock < instance.cantidad:
-            raise serializers.ValidationError(f"Stock insuficiente. Máximo disponible: {instance.producto.stock}")
-        
+        if nueva_cantidad > instance.producto.stock:
+            raise serializers.ValidationError({
+                "cantidad": f"Solo hay {instance.producto.stock} unidades disponibles."
+            })
+
+        instance.cantidad = nueva_cantidad
         instance.save()
         return instance
 
