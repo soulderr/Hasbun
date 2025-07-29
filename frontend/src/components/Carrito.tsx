@@ -9,6 +9,7 @@ import Table from 'react-bootstrap/Table';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { RootState } from '../store';
+import { useDispatch } from "react-redux";
 
 interface ProductoInvitado {
   idProducto: string;
@@ -19,8 +20,9 @@ interface ProductoInvitado {
   stock: number;
 }
 
-const Carrito: React.FC = () => {
+const Carrito: React.FC = () => { 
   const dispatch = useAppDispatch();
+  const [errorStock, setErrorStock] = useState<Record<number, string>>({});
   const { items, total, loading } = useAppSelector((state: RootState) => state.carrito);
   console.log('🛒 Items autenticado:', items);
   const [carritoInvitado, setCarritoInvitado] = useState<ProductoInvitado[]>([]);
@@ -57,10 +59,18 @@ const Carrito: React.FC = () => {
   }, [dispatch, isAuthenticated]);
 
 
-  const actualizarCantidad = (id: number, cantidad: number) => {
-    if (isNaN(cantidad) || cantidad < 1) return;
-    dispatch(actualizarCantidadThunk({ id, cantidad }));
+  const handleActualizarCantidad = async (id: number, cantidad: number) => {
+    setErrorStock(prev => ({ ...prev, [id]: "" })); // Limpia error de ese producto
+    try {
+      await dispatch(actualizarCantidadThunk({ id, cantidad })).unwrap();
+    } catch (err: any) {
+      setErrorStock(prev => ({
+        ...prev,
+        [id]: typeof err === "string" ? err : "Stock insuficiente"
+      }));
+    }
   };
+
 
   const eliminarItem = (id: number) => {
     dispatch(eliminarItemThunk(id));
@@ -205,9 +215,18 @@ const Carrito: React.FC = () => {
                       max={item.producto_detalle?.stock}
                       value={item.cantidad}
                       onChange={e => {
-                        const valor = parseInt(e.target.value);
-                        if (!isNaN(valor)) {
-                          actualizarCantidad(item.id, valor);
+                        const nuevaCantidad = parseInt(e.target.value);
+                        const cantidadMaxima = item.producto_detalle?.stock || 0;
+
+                        if (!isNaN(nuevaCantidad)) {
+                          // Validación de stock antes de enviar al backend
+                          if (nuevaCantidad > cantidadMaxima) {
+                            alert(`⚠️ Solo hay ${cantidadMaxima} unidades disponibles de "${item.producto_detalle?.nombreProducto}".`);
+                            return;
+                          }
+
+                          // Si pasa la validación, actualiza en backend
+                          dispatch(actualizarCantidadThunk({ id: item.id, cantidad: nuevaCantidad }));
                         }
                       }}
                       disabled={item.producto_detalle?.stock === 0}
