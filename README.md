@@ -52,6 +52,10 @@ Es una aplicación web hecha con React, Django y MySQL.
     .\.venv\Scripts\activate
 ## vaciar carritos    
     python manage.py vaciar_carritos 
+## activar en produccion
+    python manage.py crontab add
+    python manage.py crontab show
+
 ## Configuración del backend
 
 1. Instalar Django:
