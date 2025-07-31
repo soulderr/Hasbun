@@ -261,14 +261,16 @@ def historial_compras(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def lista_pdfs_ventas(request):
-    ventas = Venta.objects.all().order_by('-fecha_venta')
+    ventas = Venta.objects.filter(
+        estado='pagado'
+    ).order_by('-fecha_venta')
 
     paginator = CustomPagination()
     paginated_ventas = paginator.paginate_queryset(ventas, request)
 
     data = []
     for venta in paginated_ventas:
-        generar_pdf_venta(venta)  # ✅ Si no existe, lo crea
+        generar_pdf_venta(venta)  # ✅ Genera el PDF si no existe
         data.append({
             "orden": venta.orden_compra,
             "fecha": venta.fecha_venta,
