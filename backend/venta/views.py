@@ -25,6 +25,7 @@ from io import BytesIO
 from dotenv import load_dotenv  
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
+from carrito.models import Carrito
 load_dotenv()  
 
 def obtener_logo_base64():
@@ -150,7 +151,6 @@ def confirmar_transaccion(request):
         return redirect("http://localhost:5173/pago-fallido")
 
     try:
-        # ✅ Consultar a Transbank el resultado real
         tx = Transaction(obtener_webpay_options())
         response = tx.commit(token_ws)
         print("🔄 Resultado Transacción:", response)
@@ -173,13 +173,17 @@ def confirmar_transaccion(request):
             if producto.stock >= detalle.cantidad:
                 producto.stock -= detalle.cantidad
                 producto.save()
-            else:
-                print(f"⚠️ Stock insuficiente para {producto.nombreProducto}")
 
-        # Generar PDF
+        # 🔹 Vaciar carrito del usuario
+        try:
+            carrito = Carrito.objects.get(usuario=venta.id_usuario)
+            carrito.items.all().delete()
+        except Carrito.DoesNotExist:
+            pass
+
         generar_pdf_venta(venta)
-
         return redirect(f"http://localhost:5173/pago-exitoso?orden={venta.orden_compra}")
+
     else:
         venta.estado = 'fallido'
         venta.save()
