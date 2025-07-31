@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -177,3 +178,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'cristianeduardomontes@gmail.com'        # Usa tu correo
 EMAIL_HOST_PASSWORD = 'gejl hjvv vqmz dblu'  # Usa una contraseña de aplicación si es Gmail
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Configuración de django-crontab vacia los carritos a las 00:00 horas todos los días
+CRONJOBS = [
+    ('0 0 * * *', 'django.core.management.call_command', ['vaciar_carritos']),
+]
