@@ -23,15 +23,22 @@ class ItemCarritoSerializer(serializers.ModelSerializer):
         read_only_fields = ['carrito', 'fecha_agregado']
 
     def validate(self, data):
-        # Si es actualización parcial, usar el producto existente
+        # Si es actualización, usar el producto del instance
         producto = data.get('producto', getattr(self.instance, 'producto', None))
         cantidad = data.get('cantidad', getattr(self.instance, 'cantidad', None))
 
-        if producto and cantidad and producto.stock < cantidad:
+        if producto is None:
+            raise serializers.ValidationError("Debe especificar un producto válido.")
+
+        if cantidad is None or cantidad <= 0:
+            raise serializers.ValidationError("La cantidad debe ser mayor que cero.")
+
+        # Validar stock disponible
+        if producto.stock < cantidad:
             raise serializers.ValidationError(
-                f"Solo hay {producto.stock} unidades disponibles."
+                {"cantidad": f"⚠️ Solo hay {producto.stock} unidades disponibles de '{producto.nombreProducto}'."}
             )
-        
+
         return data
 
     def update(self, instance, validated_data):

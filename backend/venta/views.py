@@ -76,24 +76,26 @@ class IniciarPagoView(APIView):
         usuario_id = data.get("usuario_id")
         productos = data.get("productos", [])
         invitado = data.get("invitado", False)
-    
-        usuario = None
+
+        # Buscar usuario
         if usuario_id:
             usuario = get_object_or_404(Usuario, id=usuario_id)
         else:
-            # Puedes usar un "Usuario Invitado" predefinido o dejarlo como null
-            usuario = Usuario.objects.get(email="invitado@correo.com")  # opcional
+            usuario = Usuario.objects.get(email="invitado@correo.com")  # Usuario invitado por defecto
+
+        # Validar datos de usuario si no es invitado
         if usuario_id and (not usuario.first_name or not usuario.last_name or not usuario.email):
             return Response({
                 'error': 'Por favor completa tus datos (nombre, apellido y correo electrónico) antes de continuar con el pago.'
             }, status=400)
-        # Código único para la transacción
+
+        # Código único de orden
         orden_compra = str(uuid.uuid4())[:12]
 
-        # Crear venta con estado pendiente
+        # Crear venta
         venta = Venta.objects.create(
             id_usuario=usuario,
-            total=0,  # se actualizará
+            total=0,
             estado="pendiente",
             orden_compra=orden_compra
         )
@@ -102,6 +104,13 @@ class IniciarPagoView(APIView):
         for item in productos:
             producto = get_object_or_404(Producto, idProducto=item["id_producto"])
             cantidad = item["cantidad"]
+
+            # Validar stock antes de iniciar pago
+            if cantidad > producto.stock:
+                return Response({
+                    "error": f"Solo hay {producto.stock} unidades disponibles de {producto.nombreProducto}."
+                }, status=400)
+
             precio_unitario = producto.precioNeto
             subtotal = cantidad * precio_unitario
             total += subtotal
@@ -114,18 +123,14 @@ class IniciarPagoView(APIView):
                 subtotal=subtotal
             )
 
+        # Actualizar total
         venta.total = total
         venta.save()
 
         return_url = os.getenv("RETURN_URL")
-        
-        # 👇✅ Agrega este print para verificar que estás mandando la URL correcta
 
-        print("📦 Return URL enviado a Webpay:", return_url)
-
+        # Iniciar transacción en Webpay
         tx = Transaction(obtener_webpay_options())
-
-
         response = tx.create(orden_compra, str(usuario.id), total, return_url)
 
         venta.token_webpay = response["token"]
@@ -135,6 +140,7 @@ class IniciarPagoView(APIView):
             "url": response["url"],
             "token": response["token"]
         })
+
 
 
 @csrf_exempt
@@ -152,21 +158,27 @@ def confirmar_transaccion(request):
         print(f"❌ Error en commit: {e}")
         return redirect("http://localhost:5173/pago-fallido")
 
-    # Buscar la venta por la orden real entregada por Transbank
     try:
         venta = Venta.objects.get(orden_compra=response['buy_order'])
     except Venta.DoesNotExist:
         return redirect("http://localhost:5173/pago-fallido")
 
-    # Verificar si fue autorizada
     if response['status'] == 'AUTHORIZED':
         venta.estado = 'pagado'
         venta.save()
 
+        # 🔹 Descontar stock
+        for detalle in venta.detalles.all():
+            producto = detalle.id_producto
+            if producto.stock >= detalle.cantidad:
+                producto.stock -= detalle.cantidad
+                producto.save()
+            else:
+                print(f"⚠️ Stock insuficiente para {producto.nombreProducto}")
+
         # Generar PDF
         generar_pdf_venta(venta)
 
-        # Redirigir a frontend con la orden para mostrar comprobante
         return redirect(f"http://localhost:5173/pago-exitoso?orden={venta.orden_compra}")
     else:
         venta.estado = 'fallido'
