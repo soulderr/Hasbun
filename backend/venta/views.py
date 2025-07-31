@@ -13,7 +13,7 @@ import uuid
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseBadRequest
 from xhtml2pdf import pisa
-from django.template.loader import get_template
+from django.template.loader import get_template, render_to_string
 from django.http import HttpResponse
 from venta.models import Venta
 from detalleVenta.models import DetalleVenta
@@ -21,13 +21,43 @@ from producto.models import Producto
 from usuarios.models import Usuario
 import os 
 import base64
+from io import BytesIO
 from dotenv import load_dotenv  
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 load_dotenv()  
 
+def obtener_logo_base64():
+    ruta_logo = os.path.join(settings.STATIC_ROOT, 'img', 'logo.png')
+    if not os.path.exists(ruta_logo):
+        print(f"⚠️ No se encontró el logo en {ruta_logo}")
+        return ''
+    with open(ruta_logo, 'rb') as f:
+        return base64.b64encode(f.read()).decode('utf-8')
 
+def generar_pdf_venta(venta):
+    template = get_template('venta/pdf_venta.html')
 
+    # Codificar logo como base64
+    logo_path = os.path.join(settings.BASE_DIR, 'static', 'logo.png')
+    with open(logo_path, "rb") as image_file:
+        logo_base64 = base64.b64encode(image_file.read()).decode('utf-8')
+
+    html = template.render({
+        'venta': venta,
+        'logo_base64': logo_base64,
+    })
+
+    output_path = os.path.join(settings.MEDIA_ROOT, f'ventas/venta_{venta.orden_compra}.pdf')
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+    with open(output_path, "wb") as f:
+        pisa.CreatePDF(html, dest=f)
+
+    with open(output_path, "rb") as f:
+        response = HttpResponse(f.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="venta_{venta.orden_compra}.pdf"'
+        return response
 
 def obtener_webpay_options():
     tipo = os.getenv("TRANSBANK_ENV", "TEST")
@@ -106,29 +136,42 @@ class IniciarPagoView(APIView):
             "token": response["token"]
         })
 
+
 @csrf_exempt
 def confirmar_transaccion(request):
-    token = request.POST.get('token_ws') or request.GET.get('token_ws')
-    if not token:
-        return HttpResponseBadRequest("Token no proporcionado")
+    token_ws = request.GET.get("token_ws")
+    if not token_ws:
+        return redirect("http://localhost:5173/pago-fallido")
 
     try:
-        options = obtener_webpay_options()  # ✅ Corrección aquí
-        transaccion = Transaction(options)
-        response = transaccion.commit(token)
-
+        # ✅ Consultar a Transbank el resultado real
+        tx = Transaction(obtener_webpay_options())
+        response = tx.commit(token_ws)
         print("🔄 Resultado Transacción:", response)
-
-        if response['status'] == 'AUTHORIZED':
-            venta = Venta.objects.get(orden_compra=response['buy_order'])
-            venta.estado = 'pagado'
-            venta.save()
-            return redirect(f'http://localhost:5173/pago-exitoso?orden={venta.orden_compra}')
-        else:
-            return redirect(f'http://localhost:5173/pago-fallido?orden={response["buy_order"]}')
     except Exception as e:
-        print("❌ Error al confirmar transacción:", e)
-        return redirect('http://localhost:5173/pago-fallido')
+        print(f"❌ Error en commit: {e}")
+        return redirect("http://localhost:5173/pago-fallido")
+
+    # Buscar la venta por la orden real entregada por Transbank
+    try:
+        venta = Venta.objects.get(orden_compra=response['buy_order'])
+    except Venta.DoesNotExist:
+        return redirect("http://localhost:5173/pago-fallido")
+
+    # Verificar si fue autorizada
+    if response['status'] == 'AUTHORIZED':
+        venta.estado = 'pagado'
+        venta.save()
+
+        # Generar PDF
+        generar_pdf_venta(venta)
+
+        # Redirigir a frontend con la orden para mostrar comprobante
+        return redirect(f"http://localhost:5173/pago-exitoso?orden={venta.orden_compra}")
+    else:
+        venta.estado = 'fallido'
+        venta.save()
+        return redirect("http://localhost:5173/pago-fallido")
 
     
 @api_view(['GET'])
@@ -187,34 +230,6 @@ def reintentar_pago(request):
     except Venta.DoesNotExist:
         return Response({'error': 'Venta no encontrada'}, status=404)
     
-def generar_pdf_venta(request, orden):
-    try:
-        venta = Venta.objects.get(orden_compra=orden)
-        template = get_template('venta/pdf_venta.html')
-
-        # Codificar la imagen como base64
-        logo_path = os.path.join(settings.BASE_DIR, 'static', 'logo.png')
-        with open(logo_path, "rb") as image_file:
-            logo_base64 = base64.b64encode(image_file.read()).decode('utf-8')
-
-        html = template.render({
-            'venta': venta,
-            'logo_base64': logo_base64,
-        })
-
-        output_path = os.path.join(settings.MEDIA_ROOT, f'ventas/venta_{orden}.pdf')
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-        with open(output_path, "wb") as f:
-            pisa.CreatePDF(html, dest=f)
-
-        with open(output_path, "rb") as f:
-            response = HttpResponse(f.read(), content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="venta_{orden}.pdf"'
-            return response
-
-    except Venta.DoesNotExist:
-        return HttpResponse("Venta no encontrada", status=404)
 
 class CustomPagination(PageNumberPagination):
     page_size = 5  # Solo 5 por página
@@ -232,12 +247,13 @@ def historial_compras(request):
 
     data = []
     for venta in paginated_ventas:
+        generar_pdf_venta(venta)  # ✅ Si no existe, lo crea
         data.append({
             'orden': venta.orden_compra,
             'fecha': venta.fecha_venta,
             'total': float(venta.total),
             'estado': venta.estado,
-            'pdf_url': f"http://localhost:8000/venta/pdf/{venta.orden_compra}/"
+            'pdf_url': f"http://localhost:8000/media/ventas/venta_{venta.orden_compra}.pdf"
         })
 
     return paginator.get_paginated_response(data)
@@ -245,13 +261,14 @@ def historial_compras(request):
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def lista_pdfs_ventas(request):
-    ventas = Venta.objects.all().order_by('-fecha_venta')  # Ordenadas por fecha descendente
+    ventas = Venta.objects.all().order_by('-fecha_venta')
 
     paginator = CustomPagination()
     paginated_ventas = paginator.paginate_queryset(ventas, request)
 
     data = []
     for venta in paginated_ventas:
+        generar_pdf_venta(venta)  # ✅ Si no existe, lo crea
         data.append({
             "orden": venta.orden_compra,
             "fecha": venta.fecha_venta,
